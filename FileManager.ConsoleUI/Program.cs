@@ -18,7 +18,6 @@ namespace FileManager.ConsoleUI
             IFileManager fileManager = new FileManager(leftDirectoryManager, rightDirectoryManager, leftWindowPainter, rightWindowPainter);
 
             fileManager.Start();
-            fileManager.Dispose();
 
             Console.ReadKey();
         }
@@ -27,6 +26,7 @@ namespace FileManager.ConsoleUI
         {
             Console.CancelKeyPress += (sender, e) => { };
             Console.CursorVisible = false;
+            Console.Title = "File Manager";
             Console.BackgroundColor = ConsoleColor.DarkBlue;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();

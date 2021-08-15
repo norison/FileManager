@@ -7,5 +7,7 @@
         int CenterPosition { get; }
         int PathStartPosition { get; }
         int PathMaxLength { get; }
+        int LeftHeaderPosition { get; }
+        int RightHeaderPosition { get; }
     }
 }

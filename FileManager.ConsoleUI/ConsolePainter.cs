@@ -31,6 +31,8 @@ namespace FileManager.ConsoleUI
             DrawVerticalLines();
             DrawHorizontalLines();
             DrawBottomLines();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            DrawHeader();
             Console.ForegroundColor = ConsoleColor.White;
         }
 
@@ -142,6 +144,17 @@ namespace FileManager.ConsoleUI
                     Console.Write(BorderSymbols.HorizontalStraightLine);
                 }
             }
+        }
+
+        private void DrawHeader()
+        {
+            var value = "Name";
+
+            Console.SetCursorPosition(_settings.LeftHeaderPosition - value.Length / 2, 1);
+            Console.Write(value);
+
+            Console.SetCursorPosition(_settings.RightHeaderPosition - value.Length / 2, 1);
+            Console.Write(value);
         }
 
         #endregion
