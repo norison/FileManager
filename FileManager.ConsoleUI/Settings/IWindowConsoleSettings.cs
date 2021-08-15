@@ -2,6 +2,7 @@
 {
     public interface IWindowConsoleSettings
     {
+        int WindowWidth { get; }
         int LeftBorderPosition { get; }
         int RightBorderPosition { get; }
         int CenterPosition { get; }

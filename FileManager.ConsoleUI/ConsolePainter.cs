@@ -26,6 +26,8 @@ namespace FileManager.ConsoleUI
 
         public void DrawWindow()
         {
+            ClearWindow();
+
             Console.ForegroundColor = ConsoleColor.Cyan;
             DrawTopLines();
             DrawVerticalLines();
@@ -46,7 +48,7 @@ namespace FileManager.ConsoleUI
             }
             else
             {
-                path = path.Replace(path.Substring(3, path.Length - Console.WindowWidth / 2 + 5), "...");
+                path = path.Replace(path.Substring(3, path.Length - _settings.WindowWidth + 5), "...");
                 var position = _settings.PathStartPosition;
                 Console.SetCursorPosition(position, Console.WindowTop);
                 Console.Write(path);
@@ -149,12 +151,32 @@ namespace FileManager.ConsoleUI
         private void DrawHeader()
         {
             var value = "Name";
+            var valueCenter = value.Length / 2;
 
-            Console.SetCursorPosition(_settings.LeftHeaderPosition - value.Length / 2, 1);
+            Console.SetCursorPosition(_settings.LeftHeaderPosition - valueCenter, 1);
             Console.Write(value);
 
-            Console.SetCursorPosition(_settings.RightHeaderPosition - value.Length / 2, 1);
+            Console.SetCursorPosition(_settings.RightHeaderPosition - valueCenter, 1);
             Console.Write(value);
+        }
+
+        private void ClearWindow()
+        {
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            Console.SetCursorPosition(_settings.LeftBorderPosition, 0);
+
+            for (int i = 0; i < Console.WindowHeight; i++)
+            {
+                for (int j = _settings.LeftBorderPosition; j <= _settings.RightBorderPosition; j++)
+                {
+                    Console.Write(' ');   
+                }
+
+                Console.CursorLeft = _settings.LeftBorderPosition;
+                Console.CursorTop++;
+            }
+
+            Console.CursorVisible = false;
         }
 
         #endregion

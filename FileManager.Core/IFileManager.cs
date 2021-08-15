@@ -2,7 +2,7 @@
 
 namespace FileManager.Core
 {
-    public interface IFileManager
+    public interface IFileManager : IDisposable
     {
         void Start();
     }

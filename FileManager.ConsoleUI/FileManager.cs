@@ -1,4 +1,5 @@
-﻿using FileManager.Core;
+﻿using System;
+using FileManager.Core;
 using FileManager.SystemInformation;
 
 namespace FileManager.ConsoleUI
@@ -13,6 +14,7 @@ namespace FileManager.ConsoleUI
     {
         #region Private Fields
 
+        private readonly IWindowSizeMonitoring _windowSizeMonitoring;
         private readonly IDirectoryManager _leftDirectoryManager;
         private readonly IDirectoryManager _rightDirectoryManager;
         private readonly IPainter _leftWindowPainter;
@@ -26,16 +28,34 @@ namespace FileManager.ConsoleUI
 
         #region Constructor
 
-        public FileManager(IDirectoryManager leftDirectoryManager, IDirectoryManager rightDirectoryManager, IPainter leftWindowPainter, IPainter rightWindowPainter)
+        public FileManager(IWindowSizeMonitoring windowSizeMonitoring, IDirectoryManager leftDirectoryManager, IDirectoryManager rightDirectoryManager, IPainter leftWindowPainter, IPainter rightWindowPainter)
         {
-            _leftDirectoryManager = leftDirectoryManager;
-            _rightDirectoryManager = rightDirectoryManager;
-            _leftWindowPainter = leftWindowPainter;
-            _rightWindowPainter = rightWindowPainter;
+            _windowSizeMonitoring = windowSizeMonitoring ?? throw new ArgumentNullException(nameof(windowSizeMonitoring));
+            _leftDirectoryManager = leftDirectoryManager ?? throw new ArgumentNullException(nameof(leftDirectoryManager));
+            _rightDirectoryManager = rightDirectoryManager ?? throw new ArgumentNullException(nameof(rightDirectoryManager));
+            _leftWindowPainter = leftWindowPainter ?? throw new ArgumentNullException(nameof(leftWindowPainter));
+            _rightWindowPainter = rightWindowPainter ?? throw new ArgumentNullException(nameof(rightWindowPainter));
 
             _selectedWindowPart = WindowPart.Left;
             _selectedPainter = leftWindowPainter;
             _selectedDirectoryManager = leftDirectoryManager;
+
+            _windowSizeMonitoring.WindowSizeChanged += WindowSizeMonitoringOnWindowSizeChanged;
+        }
+
+        public void Dispose()
+        {
+            _windowSizeMonitoring.WindowSizeChanged -= WindowSizeMonitoringOnWindowSizeChanged;
+            _windowSizeMonitoring.Dispose();
+        }
+
+        #endregion
+
+        #region Event Handlers
+
+        private void WindowSizeMonitoringOnWindowSizeChanged()
+        {
+            DrawWindow();
         }
 
         #endregion
@@ -44,16 +64,30 @@ namespace FileManager.ConsoleUI
 
         public void Start()
         {
-            _leftWindowPainter.DrawWindow();
-            _leftWindowPainter.DrawPath(_leftDirectoryManager.Path);
+            _windowSizeMonitoring.Start();
 
-            _rightWindowPainter.DrawWindow();
-            _rightWindowPainter.DrawPath(_rightDirectoryManager.Path);
+            DrawWindow();
         }
 
         #endregion
 
         #region Private Methods
+
+        private void DrawWindow()
+        {
+            try
+            {
+                _leftWindowPainter.DrawWindow();
+                _leftWindowPainter.DrawPath(_leftDirectoryManager.Path);
+
+                _rightWindowPainter.DrawWindow();
+                _rightWindowPainter.DrawPath(_rightDirectoryManager.Path);
+            }
+            catch
+            {
+               // do nothing
+            }
+        }
 
         private void SwitchWindow()
         {

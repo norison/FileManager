@@ -15,7 +15,8 @@ namespace FileManager.ConsoleUI
             IDirectoryManager rightDirectoryManager = new DirectoryManager("D:\\Development\\Work\\Gateways_Generic\\AbbasDominusMillennium\\Gateway\\Configuration");
             IPainter leftWindowPainter = new ConsolePainter(new LeftWindowConsoleSettings());
             IPainter rightWindowPainter = new ConsolePainter(new RightWindowConsoleSettings());
-            IFileManager fileManager = new FileManager(leftDirectoryManager, rightDirectoryManager, leftWindowPainter, rightWindowPainter);
+            IWindowSizeMonitoring windowSizeMonitoring = new ConsoleWindowSizeMonitoring(1000);
+            IFileManager fileManager = new FileManager(windowSizeMonitoring, leftDirectoryManager, rightDirectoryManager, leftWindowPainter, rightWindowPainter);
 
             fileManager.Start();
 
@@ -27,9 +28,9 @@ namespace FileManager.ConsoleUI
             Console.CancelKeyPress += (sender, e) => { };
             Console.CursorVisible = false;
             Console.Title = "File Manager";
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Clear();
+            //Console.BackgroundColor = ConsoleColor.DarkBlue;
+            //Console.ForegroundColor = ConsoleColor.White;
+            //Console.Clear();
         }
     }
 }
