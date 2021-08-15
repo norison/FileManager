@@ -79,9 +79,11 @@ namespace FileManager.ConsoleUI
             {
                 _leftWindowPainter.DrawWindow();
                 _leftWindowPainter.DrawPath(_leftDirectoryManager.Path);
+                _leftWindowPainter.DrawSystemEntries(_leftDirectoryManager.FileInfos, _leftDirectoryManager.IsRoot);
 
                 _rightWindowPainter.DrawWindow();
                 _rightWindowPainter.DrawPath(_rightDirectoryManager.Path);
+                _rightWindowPainter.DrawSystemEntries(_rightDirectoryManager.FileInfos, _rightDirectoryManager.IsRoot);
             }
             catch
             {

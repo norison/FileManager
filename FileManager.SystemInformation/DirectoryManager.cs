@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace FileManager.SystemInformation
 {
@@ -7,7 +9,6 @@ namespace FileManager.SystemInformation
         #region Private Fields
 
         private DirectoryInfo _directoryInfo;
-        private FileSystemInfo[] _fileSystemInfos;
 
         #endregion
 
@@ -15,6 +16,7 @@ namespace FileManager.SystemInformation
 
         public string Path => _directoryInfo?.FullName;
         public bool IsRoot => _directoryInfo?.Parent != null;
+        public IList<EntryInfo> FileInfos { get; private set; }
 
         #endregion
 
@@ -22,7 +24,7 @@ namespace FileManager.SystemInformation
 
         public DirectoryManager(string path)
         {
-            Initialize(path);
+            Setup(path);
         }
 
         #endregion
@@ -31,14 +33,20 @@ namespace FileManager.SystemInformation
 
         public void ChangeDirectory(string path)
         {
-            Initialize(path);
+            Setup(path);
         }
 
         #endregion
 
         #region Private Methods
 
-        private void Initialize(string path)
+        private void Setup(string path)
+        {
+            InitializeDirectoryInfo(path);
+            InitializeFileInfos();
+        }
+
+        private void InitializeDirectoryInfo(string path)
         {
             if (!Directory.Exists(path))
             {
@@ -46,7 +54,20 @@ namespace FileManager.SystemInformation
             }
 
             _directoryInfo = new DirectoryInfo(path);
-            _fileSystemInfos = _directoryInfo.GetFileSystemInfos();
+        }
+
+        private void InitializeFileInfos()
+        {
+            FileInfos = _directoryInfo
+                .GetFileSystemInfos()
+                .Select(info => new EntryInfo
+                {
+                    Name = info.Name,
+                    FullPath = info.FullName,
+                    Attributes = info.Attributes,
+                    Extenstion = info.Extension
+                })
+                .ToList();
         }
 
         #endregion

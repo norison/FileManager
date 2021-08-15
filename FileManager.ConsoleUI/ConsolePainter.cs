@@ -1,7 +1,9 @@
 ﻿using FileManager.ConsoleUI.Constants;
 using FileManager.ConsoleUI.Settings;
 using FileManager.Core;
+using FileManager.SystemInformation;
 using System;
+using System.Collections.Generic;
 
 namespace FileManager.ConsoleUI
 {
@@ -52,6 +54,44 @@ namespace FileManager.ConsoleUI
                 var position = _settings.PathStartPosition;
                 Console.SetCursorPosition(position, Console.WindowTop);
                 Console.Write(path);
+            }
+        }
+
+        public void DrawSystemEntries(IList<EntryInfo> fileInfos, bool isRoot)
+        {
+            Console.SetCursorPosition(_settings.LeftEntriesStartPosition, 2);
+
+            var maxLength = _settings.LeftEntryMaxLength;
+
+            for (int i = 0; i < fileInfos.Count; i++)
+            {
+                if (i == 0 && isRoot)
+                {
+                    Console.Write("..");
+                    Console.CursorLeft = _settings.LeftEntriesStartPosition;
+                    Console.CursorTop++;
+                }
+                else
+                {
+                    Console.Write(GetResizedEntryName(fileInfos[i].Name, maxLength));
+
+                    if (i == Console.WindowHeight - 6)
+                    {
+                        maxLength = _settings.RightEntryMaxLength;
+                        Console.CursorLeft = _settings.RightEntriesStartPosition;
+                        Console.CursorTop = 2;
+                    }
+                    else if (i < Console.WindowHeight - 6)
+                    {
+                        Console.CursorLeft = _settings.LeftEntriesStartPosition;
+                        Console.CursorTop++;
+                    }
+                    else
+                    {
+                        Console.CursorLeft = _settings.RightEntriesStartPosition;
+                        Console.CursorTop++;
+                    }
+                }
             }
         }
 
@@ -169,7 +209,7 @@ namespace FileManager.ConsoleUI
             {
                 for (int j = _settings.LeftBorderPosition; j <= _settings.RightBorderPosition; j++)
                 {
-                    Console.Write(' ');   
+                    Console.Write(' ');
                 }
 
                 Console.CursorLeft = _settings.LeftBorderPosition;
@@ -177,6 +217,16 @@ namespace FileManager.ConsoleUI
             }
 
             Console.CursorVisible = false;
+        }
+
+        private string GetResizedEntryName(string name, int maxLength)
+        {
+            if (name.Length > _settings.LeftEntryMaxLength)
+            {
+                return name.Substring(0, maxLength) + "}";
+            }
+
+            return name;
         }
 
         #endregion

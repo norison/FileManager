@@ -5,12 +5,17 @@ namespace FileManager.ConsoleUI.Settings
     public class LeftWindowConsoleSettings : IWindowConsoleSettings
     {
         public int WindowWidth => Console.WindowWidth / 2;
+        public int WindowHeight => Console.WindowHeight - 2;
         public int LeftBorderPosition => 0;
-        public int RightBorderPosition => Console.WindowWidth / 2 - 1;
-        public int CenterPosition => Console.WindowWidth / 4;
+        public int RightBorderPosition => WindowWidth - 1;
+        public int CenterPosition => WindowWidth / 2;
         public int PathStartPosition => 1;
-        public int PathMaxLength => Console.WindowWidth / 2 - 2;
-        public int LeftHeaderPosition => Console.WindowWidth / 8;
-        public int RightHeaderPosition => Console.WindowWidth / 2 - Console.WindowWidth / 8;
+        public int PathMaxLength => WindowWidth - 2;
+        public int LeftHeaderPosition => WindowWidth / 4;
+        public int RightHeaderPosition => WindowWidth - WindowWidth / 4;
+        public int LeftEntriesStartPosition => 1;
+        public int RightEntriesStartPosition => CenterPosition + 1;
+        public int LeftEntryMaxLength => CenterPosition - 2;
+        public int RightEntryMaxLength => WindowWidth - CenterPosition - 3;
     }
 }

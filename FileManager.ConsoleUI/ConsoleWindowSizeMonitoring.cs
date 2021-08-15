@@ -27,7 +27,11 @@ namespace FileManager.ConsoleUI
 
         public void Dispose()
         {
-            _timer?.Dispose();
+            if (_timer != null)
+            {
+                _timer.Elapsed -= TimerOnElapsed;
+                _timer.Dispose();
+            }
         }
 
         #endregion
