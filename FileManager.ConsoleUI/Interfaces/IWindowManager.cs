@@ -8,5 +8,6 @@ namespace FileManager.ConsoleUI.Interfaces
         void Up();
         void Down();
         void Enter();
+        void Tab();
     }
 }

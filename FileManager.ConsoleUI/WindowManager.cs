@@ -1,4 +1,5 @@
-﻿using FileManager.ConsoleUI.Interfaces;
+﻿using System;
+using FileManager.ConsoleUI.Interfaces;
 using FileManager.SystemInformation;
 
 namespace FileManager.ConsoleUI
@@ -59,17 +60,22 @@ namespace FileManager.ConsoleUI
 
         public void Up()
         {
-
+            throw new NotImplementedException();
         }
 
         public void Down()
         {
-
+            throw new NotImplementedException();
         }
 
         public void Enter()
         {
+            throw new NotImplementedException();
+        }
 
+        public void Tab()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

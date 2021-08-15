@@ -27,7 +27,8 @@ namespace FileManager.ConsoleUI
             windowSizeMonitoring.Start();
             fileManager.Start();
 
-            Console.ReadKey();
+            fileManager.Dispose();
+            windowSizeMonitoring.Dispose();
         }
 
         static void SetupConsole()

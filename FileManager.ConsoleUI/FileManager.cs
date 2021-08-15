@@ -1,4 +1,5 @@
-﻿using FileManager.ConsoleUI.Interfaces;
+﻿using System;
+using FileManager.ConsoleUI.Interfaces;
 
 namespace FileManager.ConsoleUI
 {
@@ -45,6 +46,52 @@ namespace FileManager.ConsoleUI
         {
             _leftWindowManager.DrawWindow();
             _rightWindowManager.DrawWindow();
+
+            var exitRequested = false;
+
+            while (!exitRequested)
+            {
+                var key = Console.ReadKey(true).Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        _selectedWindowManager.Up();
+                        break;
+                    case ConsoleKey.DownArrow:
+                        _selectedWindowManager.Down();
+                        break;
+                    case ConsoleKey.Enter:
+                        _selectedWindowManager.Enter();
+                        break;
+                    case ConsoleKey.Tab:
+                        _selectedWindowManager.Tab();
+                        SwitchWindow();
+                        break;
+                    case ConsoleKey.Escape:
+                        exitRequested = true;
+                        break;
+
+                }
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void SwitchWindow()
+        {
+            if (_selectedWindowPart == WindowPart.Left)
+            {
+                _selectedWindowPart = WindowPart.Right;
+                _selectedWindowManager = _rightWindowManager;
+            }
+            else
+            {
+                _selectedWindowPart = WindowPart.Left;
+                _selectedWindowManager = _leftWindowManager;
+            }
         }
 
         #endregion
