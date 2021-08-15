@@ -1,15 +1,23 @@
 ﻿using System;
 using FileManager.ConsoleUI.Constants;
+using FileManager.ConsoleUI.Settings;
+using FileManager.Core;
 
 namespace FileManager.ConsoleUI
 {
     public class ConsolePainter : IPainter
     {
+        #region Private Fields
+
+        private readonly IWindowConsoleSettings _settings;
+
+        #endregion
+
         #region Constructor
 
-        public ConsolePainter()
+        public ConsolePainter(IWindowConsoleSettings settings)
         {
-            SetupConsole();
+            _settings = settings;
         }
 
         #endregion
@@ -19,14 +27,10 @@ namespace FileManager.ConsoleUI
         public void DrawWindow()
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            DrawTopLines(ConsolePositions.LeftWindowLeftBorder, ConsolePositions.LeftWindowRightBorder);
-            DrawTopLines(ConsolePositions.RightWindowLeftBorder, ConsolePositions.RightWindowRightBorder);
-            DrawVerticalLines(ConsolePositions.LeftWindowLeftBorder, ConsolePositions.LeftWindowCenter, ConsolePositions.LeftWindowRightBorder);
-            DrawVerticalLines(ConsolePositions.RightWindowLeftBorder, ConsolePositions.RightWindowCenter, ConsolePositions.RightWindowRightBorder);
-            DrawHorizontalLines(ConsolePositions.LeftWindowLeftBorder, ConsolePositions.LeftWindowCenter, ConsolePositions.LeftWindowRightBorder);
-            DrawHorizontalLines(ConsolePositions.RightWindowLeftBorder, ConsolePositions.RightWindowCenter, ConsolePositions.RightWindowRightBorder);
-            DrawBottomLines(ConsolePositions.LeftWindowLeftBorder, ConsolePositions.LeftWindowRightBorder);
-            DrawBottomLines(ConsolePositions.RightWindowLeftBorder, ConsolePositions.RightWindowRightBorder);
+            DrawTopLines();
+            DrawVerticalLines();
+            DrawHorizontalLines();
+            DrawBottomLines();
             Console.ForegroundColor = ConsoleColor.White;
         }
 
@@ -34,26 +38,17 @@ namespace FileManager.ConsoleUI
 
         #region Private Methods
 
-        private void SetupConsole()
+        private void DrawTopLines()
         {
-            Console.CancelKeyPress += (sender, e) => { };
-            Console.CursorVisible = false;
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Clear();
-        }
+            Console.SetCursorPosition(_settings.LeftBorderPosition, 0);
 
-        private void DrawTopLines(int leftPosition, int rightPosition)
-        {
-            Console.SetCursorPosition(leftPosition, 0);
-
-            for (int i = leftPosition; i <= rightPosition; i++)
+            for (int i = _settings.LeftBorderPosition; i <= _settings.RightBorderPosition; i++)
             {
-                if (i == leftPosition)
+                if (i == _settings.LeftBorderPosition)
                 {
                     Console.Write(BorderSymbols.LeftTopCorner);
                 }
-                else if (i == rightPosition)
+                else if (i == _settings.RightBorderPosition)
                 {
                     Console.Write(BorderSymbols.RightTopCorner);
                 }
@@ -64,43 +59,43 @@ namespace FileManager.ConsoleUI
             }
         }
 
-        private void DrawVerticalLines(int leftPosition, int centerPosition, int rightPosition)
+        private void DrawVerticalLines()
         {
             Console.CursorTop = 1;
 
             for (int i = 0; i < Console.WindowHeight - 2; i++)
             {
-                Console.CursorLeft = leftPosition;
+                Console.CursorLeft = _settings.LeftBorderPosition;
                 Console.Write(BorderSymbols.VerticalStraightLine);
 
                 if (i < Console.WindowHeight - 4)
                 {
-                    Console.CursorLeft = centerPosition;
+                    Console.CursorLeft = _settings.CenterPosition;
                     Console.Write(BorderSymbols.VerticalStraightLine);
                 }
 
-                Console.CursorLeft = rightPosition;
+                Console.CursorLeft = _settings.RightBorderPosition;
                 Console.Write(BorderSymbols.VerticalStraightLine);
 
                 Console.CursorTop++;
             }
         }
 
-        private void DrawHorizontalLines(int leftPosition, int centerPosition, int rightPosition)
+        private void DrawHorizontalLines()
         {
-            Console.SetCursorPosition(leftPosition, Console.WindowHeight - 3);
+            Console.SetCursorPosition(_settings.LeftBorderPosition, Console.WindowHeight - 3);
 
-            for (int i = leftPosition; i <= rightPosition; i++)
+            for (int i = _settings.LeftBorderPosition; i <= _settings.RightBorderPosition; i++)
             {
-                if (i == leftPosition)
+                if (i == _settings.LeftBorderPosition)
                 {
                     Console.Write(BorderSymbols.LeftVerticalCornerLine);
                 }
-                else if (i == centerPosition)
+                else if (i == _settings.CenterPosition)
                 {
                     Console.Write(BorderSymbols.CenterBottomCorner);
                 }
-                else if (i == rightPosition)
+                else if (i == _settings.RightBorderPosition)
                 {
                     Console.Write(BorderSymbols.RightVerticalCornerLine);
                 }
@@ -111,17 +106,17 @@ namespace FileManager.ConsoleUI
             }
         }
 
-        private void DrawBottomLines(int leftPosition, int rightPosition)
+        private void DrawBottomLines()
         {
-            Console.SetCursorPosition(leftPosition, Console.WindowHeight - 1);
+            Console.SetCursorPosition(_settings.LeftBorderPosition, Console.WindowHeight - 1);
 
-            for (int i = leftPosition; i <= rightPosition; i++)
+            for (int i = _settings.LeftBorderPosition; i <= _settings.RightBorderPosition; i++)
             {
-                if (i == leftPosition)
+                if (i == _settings.LeftBorderPosition)
                 {
                     Console.Write(BorderSymbols.LeftBottomCorner);
                 }
-                else if (i == rightPosition)
+                else if (i == _settings.RightBorderPosition)
                 {
                     Console.Write(BorderSymbols.RightBottomCorner);
                 }

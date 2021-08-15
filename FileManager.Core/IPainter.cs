@@ -1,4 +1,4 @@
-﻿namespace FileManager.ConsoleUI
+﻿namespace FileManager.Core
 {
     public interface IPainter
     {
