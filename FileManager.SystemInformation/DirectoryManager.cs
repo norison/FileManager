@@ -2,7 +2,7 @@
 
 namespace FileManager.SystemInformation
 {
-    public class DirectoryManager
+    public class DirectoryManager : IDirectoryManager
     {
         #region Private Fields
 

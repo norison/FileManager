@@ -1,4 +1,5 @@
 ﻿using System;
+using FileManager.SystemInformation;
 
 namespace FileManager.ConsoleUI
 {
@@ -6,8 +7,12 @@ namespace FileManager.ConsoleUI
     {
         static void Main(string[] args)
         {
-            var consolePainter = new ConsolePainter();
-            consolePainter.DrawWindow();
+            IDirectoryManager directoryManager = new DirectoryManager(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+            IPainter painter = new ConsolePainter();
+            IFileManager fileManager = new FileManager(directoryManager, painter);
+
+            fileManager.Start();
+
             Console.ReadKey();
         }
     }

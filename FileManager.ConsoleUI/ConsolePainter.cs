@@ -3,7 +3,7 @@ using FileManager.ConsoleUI.Constants;
 
 namespace FileManager.ConsoleUI
 {
-    public class ConsolePainter
+    public class ConsolePainter : IPainter
     {
         #region Constructor
 
