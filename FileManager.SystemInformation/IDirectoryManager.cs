@@ -2,7 +2,7 @@
 {
     public interface IDirectoryManager
     {
-        string FolderPath { get; }
+        string Path { get; }
         bool IsRoot { get; }
         void ChangeDirectory(string path);
     }

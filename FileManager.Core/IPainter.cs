@@ -3,5 +3,6 @@
     public interface IPainter
     {
         void DrawWindow();
+        void DrawPath(string path);
     }
 }

@@ -1,7 +1,7 @@
-﻿using System;
-using FileManager.ConsoleUI.Constants;
+﻿using FileManager.ConsoleUI.Constants;
 using FileManager.ConsoleUI.Settings;
 using FileManager.Core;
+using System;
 
 namespace FileManager.ConsoleUI
 {
@@ -32,6 +32,23 @@ namespace FileManager.ConsoleUI
             DrawHorizontalLines();
             DrawBottomLines();
             Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public void DrawPath(string path)
+        {
+            if (path.Length < _settings.PathMaxLength)
+            {
+                var position = _settings.CenterPosition - path.Length / 2;
+                Console.SetCursorPosition(position, Console.WindowTop);
+                Console.Write(path);
+            }
+            else
+            {
+                path = path.Replace(path.Substring(3, path.Length - Console.WindowWidth / 2 + 5), "...");
+                var position = _settings.PathStartPosition;
+                Console.SetCursorPosition(position, Console.WindowTop);
+                Console.Write(path);
+            }
         }
 
         #endregion

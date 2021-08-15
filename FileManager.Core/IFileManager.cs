@@ -1,4 +1,6 @@
-﻿namespace FileManager.Core
+﻿using System;
+
+namespace FileManager.Core
 {
     public interface IFileManager
     {

@@ -13,7 +13,7 @@ namespace FileManager.SystemInformation
 
         #region Properties
 
-        public string FolderPath => _directoryInfo?.FullName;
+        public string Path => _directoryInfo?.FullName;
         public bool IsRoot => _directoryInfo?.Parent != null;
 
         #endregion
