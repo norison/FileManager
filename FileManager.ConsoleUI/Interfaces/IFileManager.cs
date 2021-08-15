@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FileManager.Core
+namespace FileManager.ConsoleUI.Interfaces
 {
     public interface IFileManager : IDisposable
     {

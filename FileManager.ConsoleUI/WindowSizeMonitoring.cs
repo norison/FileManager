@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Timers;
+using FileManager.ConsoleUI.Interfaces;
 
 namespace FileManager.ConsoleUI
 {
-    public class ConsoleWindowSizeMonitoring : IWindowSizeMonitoring
+    public class WindowSizeMonitoring : IWindowSizeMonitoring
     {
         #region Private Fields
 
@@ -16,7 +17,7 @@ namespace FileManager.ConsoleUI
 
         #region Constructor
 
-        public ConsoleWindowSizeMonitoring(double interval)
+        public WindowSizeMonitoring(double interval)
         {
             _width = Console.WindowWidth;
             _height = Console.WindowHeight;

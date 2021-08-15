@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FileManager.Core\FileManager.Core.csproj" />
     <ProjectReference Include="..\FileManager.SystemInformation\FileManager.SystemInformation.csproj" />
   </ItemGroup>
 

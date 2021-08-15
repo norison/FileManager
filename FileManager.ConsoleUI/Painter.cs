@@ -1,23 +1,22 @@
 ﻿using FileManager.ConsoleUI.Constants;
-using FileManager.ConsoleUI.Settings;
-using FileManager.Core;
 using FileManager.SystemInformation;
 using System;
 using System.Collections.Generic;
+using FileManager.ConsoleUI.Interfaces;
 
 namespace FileManager.ConsoleUI
 {
-    public class ConsolePainter : IPainter
+    public class Painter : IPainter
     {
         #region Private Fields
 
-        private readonly IWindowConsoleSettings _settings;
+        private readonly IWindowSettings _settings;
 
         #endregion
 
         #region Constructor
 
-        public ConsolePainter(IWindowConsoleSettings settings)
+        public Painter(IWindowSettings settings)
         {
             _settings = settings;
         }
@@ -26,10 +25,8 @@ namespace FileManager.ConsoleUI
 
         #region Public Methods
 
-        public void DrawWindow()
+        public void DrawBorder()
         {
-            ClearWindow();
-
             Console.ForegroundColor = ConsoleColor.Cyan;
             DrawTopLines();
             DrawVerticalLines();
@@ -93,6 +90,25 @@ namespace FileManager.ConsoleUI
                     }
                 }
             }
+        }
+
+        public void ClearWindow()
+        {
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            Console.SetCursorPosition(_settings.LeftBorderPosition, 0);
+
+            for (int i = 0; i < Console.WindowHeight; i++)
+            {
+                for (int j = _settings.LeftBorderPosition; j <= _settings.RightBorderPosition; j++)
+                {
+                    Console.Write(' ');
+                }
+
+                Console.CursorLeft = _settings.LeftBorderPosition;
+                Console.CursorTop++;
+            }
+
+            Console.CursorVisible = false;
         }
 
         #endregion
@@ -198,25 +214,6 @@ namespace FileManager.ConsoleUI
 
             Console.SetCursorPosition(_settings.RightHeaderPosition - valueCenter, 1);
             Console.Write(value);
-        }
-
-        private void ClearWindow()
-        {
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.SetCursorPosition(_settings.LeftBorderPosition, 0);
-
-            for (int i = 0; i < Console.WindowHeight; i++)
-            {
-                for (int j = _settings.LeftBorderPosition; j <= _settings.RightBorderPosition; j++)
-                {
-                    Console.Write(' ');
-                }
-
-                Console.CursorLeft = _settings.LeftBorderPosition;
-                Console.CursorTop++;
-            }
-
-            Console.CursorVisible = false;
         }
 
         private string GetResizedEntryName(string name, int maxLength)

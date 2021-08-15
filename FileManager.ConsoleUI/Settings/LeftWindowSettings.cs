@@ -1,11 +1,11 @@
 ﻿using System;
+using FileManager.ConsoleUI.Interfaces;
 
 namespace FileManager.ConsoleUI.Settings
 {
-    public class LeftWindowConsoleSettings : IWindowConsoleSettings
+    public class LeftWindowSettings : IWindowSettings
     {
         public int WindowWidth => Console.WindowWidth / 2;
-        public int WindowHeight => Console.WindowHeight - 2;
         public int LeftBorderPosition => 0;
         public int RightBorderPosition => WindowWidth - 1;
         public int CenterPosition => WindowWidth / 2;

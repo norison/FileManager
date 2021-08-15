@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FileManager.ConsoleUI
+namespace FileManager.ConsoleUI.Interfaces
 {
     public interface IWindowSizeMonitoring : IDisposable
     {

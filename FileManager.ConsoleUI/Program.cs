@@ -1,6 +1,6 @@
 ﻿using System;
+using FileManager.ConsoleUI.Interfaces;
 using FileManager.ConsoleUI.Settings;
-using FileManager.Core;
 using FileManager.SystemInformation;
 
 namespace FileManager.ConsoleUI
@@ -11,13 +11,20 @@ namespace FileManager.ConsoleUI
         {
             SetupConsole();
 
-            IDirectoryManager leftDirectoryManager = new DirectoryManager(@"C:\Program Files (x86)");
-            IDirectoryManager rightDirectoryManager = new DirectoryManager(@"C:\Program Files (x86)");
-            IPainter leftWindowPainter = new ConsolePainter(new LeftWindowConsoleSettings());
-            IPainter rightWindowPainter = new ConsolePainter(new RightWindowConsoleSettings());
-            IWindowSizeMonitoring windowSizeMonitoring = new ConsoleWindowSizeMonitoring(1000);
-            IFileManager fileManager = new FileManager(windowSizeMonitoring, leftDirectoryManager, rightDirectoryManager, leftWindowPainter, rightWindowPainter);
+            IDirectoryManager leftDirectoryManager = new DirectoryManager(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+            IDirectoryManager rightDirectoryManager = new DirectoryManager(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
 
+            IPainter leftWindowPainter = new Painter(new LeftWindowSettings());
+            IPainter rightWindowPainter = new Painter(new RightWindowSettings());
+
+            IWindowSizeMonitoring windowSizeMonitoring = new WindowSizeMonitoring(1000);
+
+            IWindowManager leftWindowManager = new WindowManager(windowSizeMonitoring, leftDirectoryManager, leftWindowPainter);
+            IWindowManager rightWindowManager = new WindowManager(windowSizeMonitoring, rightDirectoryManager, rightWindowPainter);
+
+            IFileManager fileManager = new FileManager(leftWindowManager, rightWindowManager);
+
+            windowSizeMonitoring.Start();
             fileManager.Start();
 
             Console.ReadKey();

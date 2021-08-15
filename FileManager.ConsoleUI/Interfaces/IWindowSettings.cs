@@ -1,9 +1,8 @@
-﻿namespace FileManager.ConsoleUI.Settings
+﻿namespace FileManager.ConsoleUI.Interfaces
 {
-    public interface IWindowConsoleSettings
+    public interface IWindowSettings
     {
         int WindowWidth { get; }
-        int WindowHeight { get; }
         int LeftBorderPosition { get; }
         int RightBorderPosition { get; }
         int CenterPosition { get; }
