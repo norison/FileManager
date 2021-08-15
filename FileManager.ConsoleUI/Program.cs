@@ -1,5 +1,4 @@
 ﻿using System;
-using FileManager.ConsoleUI.Constants;
 
 namespace FileManager.ConsoleUI
 {
