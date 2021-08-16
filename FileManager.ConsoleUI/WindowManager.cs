@@ -114,13 +114,13 @@ namespace FileManager.ConsoleUI
         public void ShowSelectedItem()
         {
             var entryInfo = _entryInfos[_selectedItemIndex];
-            _painter.ShowEntry(_selectedItemIndex, entryInfo);
+            _painter.HighlightEntry(_selectedItemIndex, entryInfo);
         }
 
         public void HideSelectedItem()
         {
             var entryInfo = _entryInfos[_selectedItemIndex];
-            _painter.HideEntry(_selectedItemIndex, entryInfo);
+            _painter.DehighlightEntry(_selectedItemIndex, entryInfo);
         }
 
         #endregion

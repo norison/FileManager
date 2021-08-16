@@ -40,19 +40,12 @@ namespace FileManager.ConsoleUI
         {
             SetPrimaryColor();
 
-            if (path.Length < _settings.PathMaxLength)
-            {
-                var position = _settings.CenterPosition - path.Length / 2;
-                Console.SetCursorPosition(position, Console.WindowTop);
-                Console.Write(path);
-            }
-            else
-            {
-                path = path.Replace(path.Substring(3, path.Length - _settings.WindowWidth + 5), "...");
-                var position = _settings.PathStartPosition;
-                Console.SetCursorPosition(position, Console.WindowTop);
-                Console.Write(path);
-            }
+            var pathWithSpaces = $" {path} ";
+            var position = GetPathStartPosition(pathWithSpaces);
+            var resizedPath = GetResizedPath(pathWithSpaces);
+
+            Console.SetCursorPosition(position, Console.WindowTop);
+            Console.Write(resizedPath);
         }
 
         public void DrawHeader()
@@ -103,9 +96,9 @@ namespace FileManager.ConsoleUI
 
             for (int i = 0; i < _settings.MaxEntriesLength; i++)
             {
-                var top = GetTopPosition(i);
-                var startPosition = GetStartPosition(i);
-                var length = GetMaxLength(i);
+                var top = GetEntryTopPosition(i);
+                var startPosition = GetEntryStartPosition(i);
+                var length = GetEntryMaxLength(i);
 
                 ClearField(startPosition, top, length);
             }
@@ -131,13 +124,13 @@ namespace FileManager.ConsoleUI
             Console.CursorVisible = false;
         }
 
-        public void ShowEntry(int index, EntryInfo entryInfo)
+        public void HighlightEntry(int index, EntryInfo entryInfo)
         {
             SetShowedEntryColor();
             PrintEntry(index, entryInfo);
         }
 
-        public void HideEntry(int index, EntryInfo entryInfo)
+        public void DehighlightEntry(int index, EntryInfo entryInfo)
         {
             SetColorByEntryType(entryInfo);
             PrintEntry(index, entryInfo);
@@ -285,11 +278,32 @@ namespace FileManager.ConsoleUI
             }
         }
 
+        private string GetResizedPath(string path)
+        {
+            if (path.Length < _settings.PathMaxLength)
+            {
+                return path;
+            }
+
+            var length = path.Length - _settings.WindowWidth + 5;
+            return path.Replace(path.Substring(4, length), "...");
+        }
+
+        private int GetPathStartPosition(string path)
+        {
+            if (path.Length < _settings.PathMaxLength)
+            {
+                return _settings.CenterPosition - path.Length / 2;
+            }
+
+            return _settings.PathStartPosition;
+        }
+
         private void PrintEntry(int index, EntryInfo entryInfo)
         {
-            var top = GetTopPosition(index);
-            var startPosition = GetStartPosition(index);
-            var maxLength = GetMaxLength(index);
+            var top = GetEntryTopPosition(index);
+            var startPosition = GetEntryStartPosition(index);
+            var maxLength = GetEntryMaxLength(index);
 
             var resizedEntryName = GetResizedEntryName(entryInfo.Name, maxLength);
 
@@ -322,21 +336,21 @@ namespace FileManager.ConsoleUI
             Console.Write(text);
         }
 
-        private int GetTopPosition(int index)
+        private int GetEntryTopPosition(int index)
         {
             return index + 2 < Console.WindowHeight - 3
                 ? index + 2
                 : index - Console.WindowHeight + 7;
         }
 
-        private int GetStartPosition(int index)
+        private int GetEntryStartPosition(int index)
         {
             return index + 2 < Console.WindowHeight - 3
                 ? _settings.LeftEntriesStartPosition
                 : _settings.RightEntriesStartPosition;
         }
 
-        private int GetMaxLength(int index)
+        private int GetEntryMaxLength(int index)
         {
             return index + 2 < Console.WindowHeight - 3
                 ? _settings.LeftEntryMaxLength
