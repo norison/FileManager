@@ -9,6 +9,7 @@ namespace FileManager.ConsoleUI.Interfaces
         void DrawPath(string path);
         void DrawHeader();
         void DrawSystemEntries(IList<EntryInfo> entryInfos);
+        void ClearPath();
         void ClearSystemEntries();
         void ClearWindow();
         void ShowEntry(int index, string entryName);

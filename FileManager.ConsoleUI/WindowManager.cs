@@ -108,8 +108,7 @@ namespace FileManager.ConsoleUI
                 _directoryManager.ChangeDirectory(info.FullPath);
             }
 
-            UpdateEntries();
-            ReDrawEntries();
+            UpdateWindow();
         }
 
         public void ShowSelectedItem()
@@ -140,14 +139,13 @@ namespace FileManager.ConsoleUI
             return infos;
         }
 
-        private void UpdateEntries()
+        private void UpdateWindow()
         {
             _selectedItemIndex = 0;
             _entryInfos = GetEntryInfosAddingBackToRoot();
-        }
 
-        private void ReDrawEntries()
-        {
+            _painter.ClearPath();
+            _painter.DrawPath(_directoryManager.Path);
             _painter.ClearSystemEntries();
             _painter.DrawSystemEntries(_entryInfos);
 

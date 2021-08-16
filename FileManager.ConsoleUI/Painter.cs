@@ -27,16 +27,18 @@ namespace FileManager.ConsoleUI
 
         public void DrawBorder()
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
+            SetSecondaryColor();
+
             DrawTopLines();
             DrawVerticalLines();
             DrawHorizontalLines();
             DrawBottomLines();
-            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public void DrawPath(string path)
         {
+            SetPrimaryColor();
+
             if (path.Length < _settings.PathMaxLength)
             {
                 var position = _settings.CenterPosition - path.Length / 2;
@@ -54,7 +56,7 @@ namespace FileManager.ConsoleUI
 
         public void DrawHeader()
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
+            SetHeaderColor();
 
             var value = "Name";
             var valueCenter = value.Length / 2;
@@ -68,6 +70,8 @@ namespace FileManager.ConsoleUI
 
         public void DrawSystemEntries(IList<EntryInfo> entryInfos)
         {
+            SetPrimaryColor();
+
             for (var i = 0; i < entryInfos.Count; i++)
             {
                 if (i >= _settings.MaxEntriesLength)
@@ -79,9 +83,22 @@ namespace FileManager.ConsoleUI
             }
         }
 
+        public void ClearPath()
+        {
+            SetSecondaryColor();
+
+            Console.SetCursorPosition(_settings.PathStartPosition, 0);
+
+            for (int i = 0; i < _settings.PathMaxLength; i++)
+            {
+                Console.Write(BorderSymbols.HorizontalStraightLine);
+            }
+        }
+
         public void ClearSystemEntries()
         {
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            SetPrimaryColor();
+
             for (int i = 0; i < _settings.MaxEntriesLength; i++)
             {
                 var top = GetTopPosition(i);
@@ -94,7 +111,8 @@ namespace FileManager.ConsoleUI
 
         public void ClearWindow()
         {
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            SetPrimaryColor();
+
             Console.SetCursorPosition(_settings.LeftBorderPosition, 0);
 
             for (var i = 0; i < Console.WindowHeight; i++)
@@ -113,19 +131,43 @@ namespace FileManager.ConsoleUI
 
         public void ShowEntry(int index, string entryName)
         {
-            Console.BackgroundColor = ConsoleColor.Cyan;
+            SetShowedEntryColor();
             PrintEntry(index, entryName);
         }
 
         public void HideEntry(int index, string entryName)
         {
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            SetPrimaryColor();
             PrintEntry(index, entryName);
         }
 
         #endregion
 
         #region Private Methods
+
+        private void SetPrimaryColor()
+        {
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        private void SetSecondaryColor()
+        {
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            Console.ForegroundColor = ConsoleColor.Cyan;
+        }
+
+        private void SetShowedEntryColor()
+        {
+            Console.BackgroundColor = ConsoleColor.Cyan;
+            Console.ForegroundColor = ConsoleColor.Black;
+        }
+
+        private void SetHeaderColor()
+        {
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+        }
 
         private void DrawTopLines()
         {
