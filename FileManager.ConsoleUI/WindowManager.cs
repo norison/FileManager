@@ -35,7 +35,7 @@ namespace FileManager.ConsoleUI
             _windowSizeMonitoring.WindowSizeChanged += WindowSizeMonitoringOnWindowSizeChanged;
 
             _selectedItemIndex = 0;
-            _entryInfos = GetEntryInfosAddingBackToRoot();
+            _entryInfos = GetEntryInfosAddingBackToParent();
         }
 
         public void Dispose()
@@ -114,26 +114,26 @@ namespace FileManager.ConsoleUI
         public void ShowSelectedItem()
         {
             var entryInfo = _entryInfos[_selectedItemIndex];
-            _painter.ShowEntry(_selectedItemIndex, entryInfo.Name);
+            _painter.ShowEntry(_selectedItemIndex, entryInfo);
         }
 
         public void HideSelectedItem()
         {
             var entryInfo = _entryInfos[_selectedItemIndex];
-            _painter.HideEntry(_selectedItemIndex, entryInfo.Name);
+            _painter.HideEntry(_selectedItemIndex, entryInfo);
         }
 
         #endregion
 
         #region Private Methods
 
-        private IList<EntryInfo> GetEntryInfosAddingBackToRoot()
+        private IList<EntryInfo> GetEntryInfosAddingBackToParent()
         {
             var infos = _directoryManager.GetEntryInfos();
 
             if (!_directoryManager.IsRoot)
             {
-                infos.Insert(0, new EntryInfo { Name = ".." });
+                infos.Insert(0, new EntryInfo { Name = "..", Attributes = FileAttributes.Directory});
             }
 
             return infos;
@@ -142,7 +142,7 @@ namespace FileManager.ConsoleUI
         private void UpdateWindow()
         {
             _selectedItemIndex = 0;
-            _entryInfos = GetEntryInfosAddingBackToRoot();
+            _entryInfos = GetEntryInfosAddingBackToParent();
 
             _painter.ClearPath();
             _painter.DrawPath(_directoryManager.Path);

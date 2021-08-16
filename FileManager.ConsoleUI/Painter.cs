@@ -2,6 +2,7 @@
 using FileManager.SystemInformation;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using FileManager.ConsoleUI.Interfaces;
 
 namespace FileManager.ConsoleUI
@@ -79,7 +80,8 @@ namespace FileManager.ConsoleUI
                     break;
                 }
 
-                PrintEntry(i, entryInfos[i].Name);
+                SetColorByEntryType(entryInfos[i]);
+                PrintEntry(i, entryInfos[i]);
             }
         }
 
@@ -129,21 +131,46 @@ namespace FileManager.ConsoleUI
             Console.CursorVisible = false;
         }
 
-        public void ShowEntry(int index, string entryName)
+        public void ShowEntry(int index, EntryInfo entryInfo)
         {
             SetShowedEntryColor();
-            PrintEntry(index, entryName);
+            PrintEntry(index, entryInfo);
         }
 
-        public void HideEntry(int index, string entryName)
+        public void HideEntry(int index, EntryInfo entryInfo)
         {
-            SetPrimaryColor();
-            PrintEntry(index, entryName);
+            SetColorByEntryType(entryInfo);
+            PrintEntry(index, entryInfo);
         }
 
         #endregion
 
         #region Private Methods
+
+        private void SetColorByEntryType(EntryInfo entryInfo)
+        {
+            var extension = entryInfo.Extenstion;
+            var attributes = entryInfo.Attributes;
+
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+
+            if (extension == ".exe" && (attributes & FileAttributes.Directory) != FileAttributes.Directory)
+                Console.ForegroundColor = ConsoleColor.Green;
+            else if (extension == ".cmd" && (attributes & FileAttributes.Directory) != FileAttributes.Directory)
+                Console.ForegroundColor = ConsoleColor.Green;
+            else if (extension == ".pak" && (attributes & FileAttributes.Directory) != FileAttributes.Directory)
+                Console.ForegroundColor = ConsoleColor.Magenta;
+            else if ((attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                Console.ForegroundColor = ConsoleColor.Blue;
+            else if ((attributes & FileAttributes.System) == FileAttributes.System)
+                Console.ForegroundColor = ConsoleColor.Blue;
+            else if ((attributes & FileAttributes.Normal) == FileAttributes.Normal)
+                Console.ForegroundColor = ConsoleColor.Cyan;
+            else if ((attributes & FileAttributes.Archive) == FileAttributes.Archive)
+                Console.ForegroundColor = ConsoleColor.Cyan;
+            else if ((attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                Console.ForegroundColor = ConsoleColor.White;
+        }
 
         private void SetPrimaryColor()
         {
@@ -258,13 +285,13 @@ namespace FileManager.ConsoleUI
             }
         }
 
-        private void PrintEntry(int index, string entryName)
+        private void PrintEntry(int index, EntryInfo entryInfo)
         {
             var top = GetTopPosition(index);
             var startPosition = GetStartPosition(index);
             var maxLength = GetMaxLength(index);
 
-            var resizedEntryName = GetResizedEntryName(entryName, maxLength);
+            var resizedEntryName = GetResizedEntryName(entryInfo.Name, maxLength);
 
             ClearField(startPosition, top, maxLength);
             PrintField(startPosition, top, resizedEntryName);

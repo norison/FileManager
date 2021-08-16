@@ -12,7 +12,7 @@ namespace FileManager.ConsoleUI.Interfaces
         void ClearPath();
         void ClearSystemEntries();
         void ClearWindow();
-        void ShowEntry(int index, string entryName);
-        void HideEntry(int index, string entryName);
+        void ShowEntry(int index, EntryInfo entryInfo);
+        void HideEntry(int index, EntryInfo entryInfo);
     }
 }
