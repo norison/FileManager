@@ -30,6 +30,7 @@ namespace FileManager.ConsoleUI
 
             _selectedWindowPart = WindowPart.Left;
             _selectedWindowManager = _leftWindowManager;
+            _selectedWindowManager.AutoShowSelectedItem = true;
         }
 
         public void Dispose()
@@ -46,8 +47,6 @@ namespace FileManager.ConsoleUI
         {
             _leftWindowManager.DrawWindow();
             _rightWindowManager.DrawWindow();
-
-            _selectedWindowManager.ShowSelectedItem();
 
             var exitRequested = false;
 
@@ -83,6 +82,7 @@ namespace FileManager.ConsoleUI
 
         private void SwitchWindow()
         {
+            _selectedWindowManager.AutoShowSelectedItem = false;
             _selectedWindowManager.HideSelectedItem();
 
             if (_selectedWindowPart == WindowPart.Left)
@@ -96,6 +96,7 @@ namespace FileManager.ConsoleUI
                 _selectedWindowManager = _leftWindowManager;
             }
 
+            _selectedWindowManager.AutoShowSelectedItem = true;
             _selectedWindowManager.ShowSelectedItem();
         }
 

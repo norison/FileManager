@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using FileManager.ConsoleUI.Interfaces;
+﻿using FileManager.ConsoleUI.Interfaces;
 using FileManager.SystemInformation;
+using System.Collections.Generic;
+using System.IO;
 
 namespace FileManager.ConsoleUI
 {
@@ -19,6 +18,12 @@ namespace FileManager.ConsoleUI
 
         #endregion
 
+        #region Properties
+
+        public bool AutoShowSelectedItem { get; set; }
+
+        #endregion
+
         #region Constructor
 
         public WindowManager(IWindowSizeMonitoring windowSizeMonitoring, IDirectoryManager directoryManager, IPainter painter)
@@ -31,8 +36,6 @@ namespace FileManager.ConsoleUI
 
             _selectedItemIndex = 0;
             _entryInfos = GetEntryInfosAddingBackToRoot();
-
-            _painter.SetEntryItems(_entryInfos);
         }
 
         public void Dispose()
@@ -60,7 +63,13 @@ namespace FileManager.ConsoleUI
                 _painter.ClearWindow();
                 _painter.DrawBorder();
                 _painter.DrawPath(_directoryManager.Path);
-                _painter.DrawSystemEntries();
+                _painter.DrawHeader();
+                _painter.DrawSystemEntries(_entryInfos);
+
+                if (AutoShowSelectedItem)
+                {
+                    ShowSelectedItem();
+                }
             }
             catch
             {
@@ -72,33 +81,48 @@ namespace FileManager.ConsoleUI
         {
             if(_selectedItemIndex == 0) return;
 
-            _painter.HideItem(_selectedItemIndex);
+            HideSelectedItem();
             _selectedItemIndex--;
-            _painter.ShowItem(_selectedItemIndex);
+            ShowSelectedItem();
         }
 
         public void MoveDown()
         {
             if(_selectedItemIndex == _entryInfos.Count - 1) return;
 
-            _painter.HideItem(_selectedItemIndex);
+            HideSelectedItem();
             _selectedItemIndex++;
-            _painter.ShowItem(_selectedItemIndex);
+            ShowSelectedItem();
         }
 
         public void Execute()
         {
-            throw new NotImplementedException();
+            var info = _entryInfos[_selectedItemIndex];
+
+            if (info.Name == "..")
+            {
+                _directoryManager.GoToParent();
+            }
+            else if ((info.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+            {
+                _directoryManager.ChangeDirectory(info.FullPath);
+            }
+
+            _selectedItemIndex = 0;
+            _entryInfos = GetEntryInfosAddingBackToRoot();
+            DrawWindow();
         }
 
         public void ShowSelectedItem()
         {
-            _painter.ShowItem(_selectedItemIndex);
+            var entryInfo = _entryInfos[_selectedItemIndex];
+            _painter.ShowEntry(_selectedItemIndex, entryInfo.Name);
         }
 
         public void HideSelectedItem()
         {
-            _painter.HideItem(_selectedItemIndex);
+            var entryInfo = _entryInfos[_selectedItemIndex];
+            _painter.HideEntry(_selectedItemIndex, entryInfo.Name);
         }
 
         #endregion
@@ -109,7 +133,7 @@ namespace FileManager.ConsoleUI
         {
             var infos = _directoryManager.GetEntryInfos();
 
-            if (_directoryManager.IsRoot)
+            if (!_directoryManager.IsRoot)
             {
                 infos.Insert(0, new EntryInfo { Name = ".." });
             }

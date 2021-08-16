@@ -11,7 +11,7 @@ namespace FileManager.ConsoleUI
         {
             SetupConsole();
 
-            IDirectoryManager leftDirectoryManager = new DirectoryManager(@"C:\Program Files (x86)");
+            IDirectoryManager leftDirectoryManager = new DirectoryManager(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
             IDirectoryManager rightDirectoryManager = new DirectoryManager(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
 
             IPainter leftWindowPainter = new Painter(new LeftWindowSettings());

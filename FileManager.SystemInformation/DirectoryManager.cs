@@ -16,7 +16,7 @@ namespace FileManager.SystemInformation
         #region Properties
 
         public string Path => _directoryInfo?.FullName;
-        public bool IsRoot => _directoryInfo?.Parent != null;
+        public bool IsRoot => _directoryInfo?.Parent == null;
 
         #endregion
 
@@ -30,6 +30,13 @@ namespace FileManager.SystemInformation
         #endregion
 
         #region Public Methods
+
+        public void GoToParent()
+        {
+            if(IsRoot) return;
+
+            Setup(_directoryInfo.Parent?.FullName);
+        }
 
         public void ChangeDirectory(string path)
         {
