@@ -14,6 +14,7 @@ namespace FileManager.ConsoleUI
         private readonly IDirectoryManager _directoryManager;
         private readonly IPainter _painter;
 
+        private IList<EntryInfo> _entryInfos;
         private int _selectedItemIndex;
 
         #endregion
@@ -29,6 +30,9 @@ namespace FileManager.ConsoleUI
             _windowSizeMonitoring.WindowSizeChanged += WindowSizeMonitoringOnWindowSizeChanged;
 
             _selectedItemIndex = 0;
+            _entryInfos = GetEntryInfosAddingBackToRoot();
+
+            _painter.SetEntryItems(_entryInfos);
         }
 
         public void Dispose()
@@ -56,7 +60,7 @@ namespace FileManager.ConsoleUI
                 _painter.ClearWindow();
                 _painter.DrawBorder();
                 _painter.DrawPath(_directoryManager.Path);
-                _painter.DrawSystemEntries(GetEntryInfosAddingBackToRoot());
+                _painter.DrawSystemEntries();
             }
             catch
             {
@@ -66,12 +70,20 @@ namespace FileManager.ConsoleUI
 
         public void MoveUp()
         {
-            throw new NotImplementedException();
+            if(_selectedItemIndex == 0) return;
+
+            _painter.HideItem(_selectedItemIndex);
+            _selectedItemIndex--;
+            _painter.ShowItem(_selectedItemIndex);
         }
 
         public void MoveDown()
         {
-            throw new NotImplementedException();
+            if(_selectedItemIndex == _entryInfos.Count - 1) return;
+
+            _painter.HideItem(_selectedItemIndex);
+            _selectedItemIndex++;
+            _painter.ShowItem(_selectedItemIndex);
         }
 
         public void Execute()
@@ -81,12 +93,12 @@ namespace FileManager.ConsoleUI
 
         public void ShowSelectedItem()
         {
-
+            _painter.ShowItem(_selectedItemIndex);
         }
 
         public void HideSelectedItem()
         {
-
+            _painter.HideItem(_selectedItemIndex);
         }
 
         #endregion

@@ -12,6 +12,8 @@ namespace FileManager.ConsoleUI
 
         private readonly IWindowSettings _settings;
 
+        private IList<EntryInfo> _entryInfos;
+
         #endregion
 
         #region Constructor
@@ -24,6 +26,11 @@ namespace FileManager.ConsoleUI
         #endregion
 
         #region Public Methods
+
+        public void SetEntryItems(IList<EntryInfo> entryInfos)
+        {
+            _entryInfos = entryInfos;
+        }
 
         public void DrawBorder()
         {
@@ -54,15 +61,15 @@ namespace FileManager.ConsoleUI
             }
         }
 
-        public void DrawSystemEntries(IList<EntryInfo> fileInfos)
+        public void DrawSystemEntries()
         {
             Console.SetCursorPosition(_settings.LeftEntriesStartPosition, 2);
 
             var maxLength = _settings.LeftEntryMaxLength;
 
-            for (int i = 0; i < fileInfos.Count; i++)
+            for (int i = 0; i < _entryInfos.Count; i++)
             {
-                Console.Write(GetResizedEntryName(fileInfos[i].Name, maxLength));
+                Console.Write(GetResizedEntryName(_entryInfos[i].Name, maxLength));
 
                 if (i == Console.WindowHeight - 6)
                 {
@@ -100,6 +107,18 @@ namespace FileManager.ConsoleUI
             }
 
             Console.CursorVisible = false;
+        }
+
+        public void ShowItem(int index)
+        {
+            Console.BackgroundColor = ConsoleColor.Cyan;
+            PrintEntry(index);
+        }
+
+        public void HideItem(int index)
+        {
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            PrintEntry(index);
         }
 
         #endregion
@@ -215,6 +234,42 @@ namespace FileManager.ConsoleUI
             }
 
             return name;
+        }
+
+        private void ClearField(int startPosition, int top, int maxLength)
+        {
+            Console.SetCursorPosition(startPosition, top);
+            for (var i = 0; i <= maxLength; i++)
+            {
+                Console.Write(' ');
+            }
+        }
+
+        private void PrintEntry(int index)
+        {
+            var position = index + 2;
+
+            int top;
+            int startPosition;
+            int maxLength;
+
+            if (position < Console.WindowHeight - 3)
+            {
+                top = index + 2;
+                startPosition = _settings.LeftEntriesStartPosition;
+                maxLength = _settings.LeftEntryMaxLength;
+            }
+            else
+            {
+                top = index - Console.WindowHeight + 7;
+                startPosition = _settings.RightEntriesStartPosition;
+                maxLength = _settings.RightEntryMaxLength;
+            }
+
+            ClearField(startPosition, top, maxLength);
+
+            Console.SetCursorPosition(startPosition, top);
+            Console.Write(GetResizedEntryName(_entryInfos[index].Name, maxLength));
         }
 
         #endregion

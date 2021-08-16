@@ -5,9 +5,12 @@ namespace FileManager.ConsoleUI.Interfaces
 {
     public interface IPainter
     {
+        void SetEntryItems(IList<EntryInfo> entryInfos);
         void DrawBorder();
         void DrawPath(string path);
-        void DrawSystemEntries(IList<EntryInfo> entryInfos);
+        void DrawSystemEntries();
         void ClearWindow();
+        void ShowItem(int index);
+        void HideItem(int index);
     }
 }

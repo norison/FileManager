@@ -47,6 +47,8 @@ namespace FileManager.ConsoleUI
             _leftWindowManager.DrawWindow();
             _rightWindowManager.DrawWindow();
 
+            _selectedWindowManager.ShowSelectedItem();
+
             var exitRequested = false;
 
             while (!exitRequested)
