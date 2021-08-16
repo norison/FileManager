@@ -70,7 +70,25 @@ namespace FileManager.ConsoleUI
         {
             for (var i = 0; i < entryInfos.Count; i++)
             {
+                if (i >= _settings.MaxEntriesLength)
+                {
+                    break;
+                }
+
                 PrintEntry(i, entryInfos[i].Name);
+            }
+        }
+
+        public void ClearSystemEntries()
+        {
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            for (int i = 0; i < _settings.MaxEntriesLength; i++)
+            {
+                var top = GetTopPosition(i);
+                var startPosition = GetStartPosition(i);
+                var length = GetMaxLength(i);
+
+                ClearField(startPosition, top, length);
             }
         }
 
@@ -196,11 +214,6 @@ namespace FileManager.ConsoleUI
                     Console.Write(BorderSymbols.HorizontalStraightLine);
                 }
             }
-        }
-
-        private void ClearSystemEntries()
-        {
-
         }
 
         private void PrintEntry(int index, string entryName)

@@ -108,9 +108,8 @@ namespace FileManager.ConsoleUI
                 _directoryManager.ChangeDirectory(info.FullPath);
             }
 
-            _selectedItemIndex = 0;
-            _entryInfos = GetEntryInfosAddingBackToRoot();
-            DrawWindow();
+            UpdateEntries();
+            ReDrawEntries();
         }
 
         public void ShowSelectedItem()
@@ -139,6 +138,23 @@ namespace FileManager.ConsoleUI
             }
 
             return infos;
+        }
+
+        private void UpdateEntries()
+        {
+            _selectedItemIndex = 0;
+            _entryInfos = GetEntryInfosAddingBackToRoot();
+        }
+
+        private void ReDrawEntries()
+        {
+            _painter.ClearSystemEntries();
+            _painter.DrawSystemEntries(_entryInfos);
+
+            if (AutoShowSelectedItem)
+            {
+                ShowSelectedItem();
+            }
         }
 
         #endregion

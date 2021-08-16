@@ -2,6 +2,7 @@
 {
     public interface IWindowSettings
     {
+        int MaxEntriesLength { get; }
         int WindowWidth { get; }
         int LeftBorderPosition { get; }
         int RightBorderPosition { get; }

@@ -5,6 +5,7 @@ namespace FileManager.ConsoleUI.Settings
 {
     public class RightWindowSettings : IWindowSettings
     {
+        public int MaxEntriesLength => (Console.WindowHeight - 5) * 2;
         public int WindowWidth => Console.WindowWidth - Console.WindowWidth / 2;
         public int LeftBorderPosition => Console.WindowWidth / 2;
         public int RightBorderPosition => Console.WindowWidth - 1;
