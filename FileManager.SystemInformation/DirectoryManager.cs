@@ -9,6 +9,7 @@ namespace FileManager.SystemInformation
         #region Private Fields
 
         private DirectoryInfo _directoryInfo;
+        private Dictionary<string, FileSystemInfo> _fileSystemInfos;
 
         #endregion
 
@@ -16,7 +17,6 @@ namespace FileManager.SystemInformation
 
         public string Path => _directoryInfo?.FullName;
         public bool IsRoot => _directoryInfo?.Parent != null;
-        public IList<EntryInfo> FileInfos { get; private set; }
 
         #endregion
 
@@ -34,6 +34,19 @@ namespace FileManager.SystemInformation
         public void ChangeDirectory(string path)
         {
             Setup(path);
+        }
+
+        public IList<EntryInfo> GetEntryInfos()
+        {
+            return _fileSystemInfos.Values
+                .Select(info => new EntryInfo
+                {
+                    Name = info.Name,
+                    FullPath = info.FullName,
+                    Attributes = info.Attributes,
+                    Extenstion = info.Extension
+                })
+                .ToList();
         }
 
         #endregion
@@ -58,16 +71,7 @@ namespace FileManager.SystemInformation
 
         private void InitializeFileInfos()
         {
-            FileInfos = _directoryInfo
-                .GetFileSystemInfos()
-                .Select(info => new EntryInfo
-                {
-                    Name = info.Name,
-                    FullPath = info.FullName,
-                    Attributes = info.Attributes,
-                    Extenstion = info.Extension
-                })
-                .ToList();
+            _fileSystemInfos = _directoryInfo.GetFileSystemInfos().ToDictionary(info => info.FullName);
         }
 
         #endregion

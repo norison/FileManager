@@ -7,7 +7,7 @@ namespace FileManager.ConsoleUI.Interfaces
     {
         void DrawBorder();
         void DrawPath(string path);
-        void DrawSystemEntries(IList<EntryInfo> fileInfos, bool isRoot);
+        void DrawSystemEntries(IList<EntryInfo> entryInfos);
         void ClearWindow();
     }
 }

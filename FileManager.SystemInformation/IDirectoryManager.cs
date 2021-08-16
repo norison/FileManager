@@ -6,7 +6,7 @@ namespace FileManager.SystemInformation
     {
         string Path { get; }
         bool IsRoot { get; }
-        IList<EntryInfo> FileInfos { get; }
+        IList<EntryInfo> GetEntryInfos();
         void ChangeDirectory(string path);
     }
 }

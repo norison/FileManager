@@ -5,9 +5,10 @@ namespace FileManager.ConsoleUI.Interfaces
     public interface IWindowManager : IDisposable
     {
         void DrawWindow();
-        void Up();
-        void Down();
-        void Enter();
-        void Tab();
+        void MoveUp();
+        void MoveDown();
+        void Execute();
+        void ShowSelectedItem();
+        void HideSelectedItem();
     }
 }

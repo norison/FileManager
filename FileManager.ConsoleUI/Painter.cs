@@ -54,7 +54,7 @@ namespace FileManager.ConsoleUI
             }
         }
 
-        public void DrawSystemEntries(IList<EntryInfo> fileInfos, bool isRoot)
+        public void DrawSystemEntries(IList<EntryInfo> fileInfos)
         {
             Console.SetCursorPosition(_settings.LeftEntriesStartPosition, 2);
 
@@ -62,32 +62,23 @@ namespace FileManager.ConsoleUI
 
             for (int i = 0; i < fileInfos.Count; i++)
             {
-                if (i == 0 && isRoot)
+                Console.Write(GetResizedEntryName(fileInfos[i].Name, maxLength));
+
+                if (i == Console.WindowHeight - 6)
                 {
-                    Console.Write("..");
+                    maxLength = _settings.RightEntryMaxLength;
+                    Console.CursorLeft = _settings.RightEntriesStartPosition;
+                    Console.CursorTop = 2;
+                }
+                else if (i < Console.WindowHeight - 6)
+                {
                     Console.CursorLeft = _settings.LeftEntriesStartPosition;
                     Console.CursorTop++;
                 }
                 else
                 {
-                    Console.Write(GetResizedEntryName(fileInfos[i].Name, maxLength));
-
-                    if (i == Console.WindowHeight - 6)
-                    {
-                        maxLength = _settings.RightEntryMaxLength;
-                        Console.CursorLeft = _settings.RightEntriesStartPosition;
-                        Console.CursorTop = 2;
-                    }
-                    else if (i < Console.WindowHeight - 6)
-                    {
-                        Console.CursorLeft = _settings.LeftEntriesStartPosition;
-                        Console.CursorTop++;
-                    }
-                    else
-                    {
-                        Console.CursorLeft = _settings.RightEntriesStartPosition;
-                        Console.CursorTop++;
-                    }
+                    Console.CursorLeft = _settings.RightEntriesStartPosition;
+                    Console.CursorTop++;
                 }
             }
         }

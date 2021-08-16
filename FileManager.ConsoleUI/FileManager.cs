@@ -56,16 +56,15 @@ namespace FileManager.ConsoleUI
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
-                        _selectedWindowManager.Up();
+                        _selectedWindowManager.MoveUp();
                         break;
                     case ConsoleKey.DownArrow:
-                        _selectedWindowManager.Down();
+                        _selectedWindowManager.MoveDown();
                         break;
                     case ConsoleKey.Enter:
-                        _selectedWindowManager.Enter();
+                        _selectedWindowManager.Execute();
                         break;
                     case ConsoleKey.Tab:
-                        _selectedWindowManager.Tab();
                         SwitchWindow();
                         break;
                     case ConsoleKey.Escape:
@@ -82,6 +81,8 @@ namespace FileManager.ConsoleUI
 
         private void SwitchWindow()
         {
+            _selectedWindowManager.HideSelectedItem();
+
             if (_selectedWindowPart == WindowPart.Left)
             {
                 _selectedWindowPart = WindowPart.Right;
@@ -92,6 +93,8 @@ namespace FileManager.ConsoleUI
                 _selectedWindowPart = WindowPart.Left;
                 _selectedWindowManager = _leftWindowManager;
             }
+
+            _selectedWindowManager.ShowSelectedItem();
         }
 
         #endregion

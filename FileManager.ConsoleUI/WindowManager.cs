@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FileManager.ConsoleUI.Interfaces;
 using FileManager.SystemInformation;
 
@@ -12,6 +14,8 @@ namespace FileManager.ConsoleUI
         private readonly IDirectoryManager _directoryManager;
         private readonly IPainter _painter;
 
+        private int _selectedItemIndex;
+
         #endregion
 
         #region Constructor
@@ -23,6 +27,8 @@ namespace FileManager.ConsoleUI
             _painter = painter;
 
             _windowSizeMonitoring.WindowSizeChanged += WindowSizeMonitoringOnWindowSizeChanged;
+
+            _selectedItemIndex = 0;
         }
 
         public void Dispose()
@@ -50,7 +56,7 @@ namespace FileManager.ConsoleUI
                 _painter.ClearWindow();
                 _painter.DrawBorder();
                 _painter.DrawPath(_directoryManager.Path);
-                _painter.DrawSystemEntries(_directoryManager.FileInfos, _directoryManager.IsRoot);
+                _painter.DrawSystemEntries(GetEntryInfosAddingBackToRoot());
             }
             catch
             {
@@ -58,24 +64,45 @@ namespace FileManager.ConsoleUI
             }
         }
 
-        public void Up()
+        public void MoveUp()
         {
             throw new NotImplementedException();
         }
 
-        public void Down()
+        public void MoveDown()
         {
             throw new NotImplementedException();
         }
 
-        public void Enter()
+        public void Execute()
         {
             throw new NotImplementedException();
         }
 
-        public void Tab()
+        public void ShowSelectedItem()
         {
-            throw new NotImplementedException();
+
+        }
+
+        public void HideSelectedItem()
+        {
+
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private IList<EntryInfo> GetEntryInfosAddingBackToRoot()
+        {
+            var infos = _directoryManager.GetEntryInfos();
+
+            if (_directoryManager.IsRoot)
+            {
+                infos.Insert(0, new EntryInfo { Name = ".." });
+            }
+
+            return infos;
         }
 
         #endregion
