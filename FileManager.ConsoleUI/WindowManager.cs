@@ -1,5 +1,4 @@
-﻿using System;
-using FileManager.ConsoleUI.Interfaces;
+﻿using FileManager.ConsoleUI.Interfaces;
 using FileManager.SystemInformation;
 using System.Collections.Generic;
 using System.IO;
@@ -154,7 +153,6 @@ namespace FileManager.ConsoleUI
 
             _painter.DrawPath(_directoryManager.Path);
             _painter.DrawSystemEntries(_entryInfos);
-            _painter.DrawEntryInfo(_entryInfos[_selectedItemIndex]);
 
             if (AutoShowSelectedItem)
             {
