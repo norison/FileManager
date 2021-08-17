@@ -88,12 +88,7 @@ namespace FileManager.ConsoleUI
         public void ClearEntryInfo()
         {
             SetSecondaryColor();
-
-            var startPosition = _settings.LeftEntriesStartPosition;
-            var top = Console.WindowHeight - 2;
-            var length = _settings.RightBorderPosition - _settings.LeftBorderPosition - 2;
-
-            ClearField(startPosition, top, length);
+            ClearField(_settings.LeftEntriesStartPosition, _settings.EntryInfosHeight, _settings.EntryInfoLength);
         }
 
         public void ClearPath()
@@ -128,7 +123,7 @@ namespace FileManager.ConsoleUI
 
             Console.SetCursorPosition(_settings.LeftBorderPosition, 0);
 
-            for (var i = 0; i < Console.WindowHeight; i++)
+            for (var i = 0; i < _settings.WindowHeight; i++)
             {
                 for (var j = _settings.LeftBorderPosition; j <= _settings.RightBorderPosition; j++)
                 {
@@ -240,7 +235,7 @@ namespace FileManager.ConsoleUI
         {
             Console.CursorTop = 1;
 
-            for (int i = 0; i < Console.WindowHeight - 2; i++)
+            for (int i = 0; i < _settings.EntryInfosHeight; i++)
             {
                 Console.CursorLeft = _settings.LeftBorderPosition;
                 Console.Write(BorderSymbols.VerticalStraightLine);
@@ -260,7 +255,7 @@ namespace FileManager.ConsoleUI
 
         private void DrawHorizontalLines()
         {
-            Console.SetCursorPosition(_settings.LeftBorderPosition, Console.WindowHeight - 3);
+            Console.SetCursorPosition(_settings.LeftBorderPosition, _settings.EntryMaxHeight);
 
             for (int i = _settings.LeftBorderPosition; i <= _settings.RightBorderPosition; i++)
             {
@@ -285,7 +280,7 @@ namespace FileManager.ConsoleUI
 
         private void DrawBottomLines()
         {
-            Console.SetCursorPosition(_settings.LeftBorderPosition, Console.WindowHeight - 1);
+            Console.SetCursorPosition(_settings.LeftBorderPosition, _settings.BottomBorderHeight);
 
             for (int i = _settings.LeftBorderPosition; i <= _settings.RightBorderPosition; i++)
             {
@@ -335,21 +330,15 @@ namespace FileManager.ConsoleUI
 
         private void PrintEntryInfoName(string entryName)
         {
-            var position = _settings.LeftEntriesStartPosition;
-            var top = Console.WindowHeight - 2;
-            var maxLength = _settings.EntryInfoNameMaxLength;
-
-            var resizedEntryName = GetResizedField(entryName, maxLength);
-
-            PrintField(position, top, resizedEntryName);
+            var resizedEntryName = GetResizedField(entryName, _settings.EntryInfoNameMaxLength);
+            PrintField(_settings.LeftEntriesStartPosition, _settings.EntryInfosHeight, resizedEntryName);
         }
 
         private void PrintEntryInfoSizeAndTime(EntryInfo entryInfo)
         {
             var text = GetEntryInfoText(entryInfo);
             var resizedText = GetResizedField(text, _settings.RightEntryMaxLength);
-
-            PrintField(_settings.RightBorderPosition - resizedText.Length, Console.WindowHeight - 2, resizedText);
+            PrintField(_settings.RightBorderPosition - resizedText.Length, _settings.EntryInfosHeight, resizedText);
         }
 
         private void PrintEntry(int index, EntryInfo entryInfo)
@@ -374,21 +363,27 @@ namespace FileManager.ConsoleUI
 
         private int GetEntryTopPosition(int index)
         {
-            return index + 2 < Console.WindowHeight - 3
-                ? index + 2
-                : index - Console.WindowHeight + 7;
+            var height = index + _settings.EntryStartHeight;
+
+            return height < _settings.EntryMaxHeight
+                ? height
+                : height - _settings.EntriesLength;
         }
 
         private int GetEntryStartPosition(int index)
         {
-            return index + 2 < Console.WindowHeight - 3
+            var height = index + _settings.EntryStartHeight;
+
+            return height < _settings.EntryMaxHeight
                 ? _settings.LeftEntriesStartPosition
                 : _settings.RightEntriesStartPosition;
         }
 
         private int GetEntryMaxLength(int index)
         {
-            return index + 2 < Console.WindowHeight - 3
+            var height = index + _settings.EntryStartHeight;
+
+            return height < _settings.EntryMaxHeight
                 ? _settings.LeftEntryMaxLength
                 : _settings.RightEntryMaxLength;
         }

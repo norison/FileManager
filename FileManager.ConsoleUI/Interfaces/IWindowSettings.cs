@@ -2,6 +2,13 @@
 {
     public interface IWindowSettings
     {
+        int WindowHeight { get; }
+        int EntryInfosHeight { get; }
+        int EntryMaxHeight { get; }
+        int EntryStartHeight { get; }
+        int EntriesLength { get; }
+        int EntryInfoLength { get; }
+        int BottomBorderHeight { get; }
         int MaxEntriesLength { get; }
         int WindowWidth { get; }
         int LeftBorderPosition { get; }

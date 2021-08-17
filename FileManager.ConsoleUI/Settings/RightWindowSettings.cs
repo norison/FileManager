@@ -1,23 +1,22 @@
 ﻿using System;
-using FileManager.ConsoleUI.Interfaces;
 
 namespace FileManager.ConsoleUI.Settings
 {
-    public class RightWindowSettings : IWindowSettings
+    public class RightWindowSettings : AbstractWindowSettings
     {
-        public int MaxEntriesLength => (Console.WindowHeight - 5) * 2;
-        public int WindowWidth => Console.WindowWidth - Console.WindowWidth / 2;
-        public int LeftBorderPosition => Console.WindowWidth / 2;
-        public int RightBorderPosition => Console.WindowWidth - 1;
-        public int CenterPosition => Console.WindowWidth - 1 - Console.WindowWidth / 4;
-        public int PathStartPosition => Console.WindowWidth / 2 + 1;
-        public int PathMaxLength => Console.WindowWidth - Console.WindowWidth / 2 - 2;
-        public int LeftHeaderPosition => Console.WindowWidth / 2 + Console.WindowWidth / 8;
-        public int RightHeaderPosition => (Console.WindowWidth + Console.WindowWidth - Console.WindowWidth / 4) / 2;
-        public int LeftEntriesStartPosition => LeftBorderPosition + 1;
-        public int RightEntriesStartPosition => CenterPosition + 1;
-        public int LeftEntryMaxLength => CenterPosition - LeftBorderPosition - 2;
-        public int RightEntryMaxLength => Console.WindowWidth - CenterPosition - 3;
-        public int EntryInfoNameMaxLength => CenterPosition - LeftBorderPosition - 2;
+        public override int MaxEntriesLength => (Console.WindowHeight - 5) * 2;
+        public override int WindowWidth => Console.WindowWidth - Console.WindowWidth / 2;
+        public override int LeftBorderPosition => Console.WindowWidth / 2;
+        public override int RightBorderPosition => Console.WindowWidth - 1;
+        public override int CenterPosition => Console.WindowWidth - 1 - Console.WindowWidth / 4;
+        public override int PathStartPosition => Console.WindowWidth / 2 + 1;
+        public override int PathMaxLength => Console.WindowWidth - Console.WindowWidth / 2 - 2;
+        public override int LeftHeaderPosition => Console.WindowWidth / 2 + Console.WindowWidth / 8;
+        public override int RightHeaderPosition => (Console.WindowWidth + Console.WindowWidth - Console.WindowWidth / 4) / 2;
+        public override int LeftEntriesStartPosition => LeftBorderPosition + 1;
+        public override int RightEntriesStartPosition => CenterPosition + 1;
+        public override int LeftEntryMaxLength => CenterPosition - LeftBorderPosition - 2;
+        public override int RightEntryMaxLength => Console.WindowWidth - CenterPosition - 3;
+        public override int EntryInfoNameMaxLength => CenterPosition - LeftBorderPosition - 2;
     }
 }
