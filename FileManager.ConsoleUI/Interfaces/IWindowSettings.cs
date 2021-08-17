@@ -15,5 +15,6 @@
         int RightEntriesStartPosition { get; }
         int LeftEntryMaxLength { get; }
         int RightEntryMaxLength { get; }
+        int EntryInfoNameMaxLength { get; }
     }
 }

@@ -51,7 +51,11 @@ namespace FileManager.SystemInformation
                     Name = info.Name,
                     FullPath = info.FullName,
                     Attributes = info.Attributes,
-                    Extenstion = info.Extension
+                    Extenstion = info.Extension,
+                    CreationTime = info.CreationTime,
+                    Bytes = info.Attributes.HasFlag(FileAttributes.Directory)
+                    ? 0
+                    : new FileInfo(info.FullName).Length
                 })
                 .ToList();
         }

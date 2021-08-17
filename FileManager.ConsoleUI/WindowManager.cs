@@ -65,6 +65,7 @@ namespace FileManager.ConsoleUI
                 _painter.DrawPath(_directoryManager.Path);
                 _painter.DrawHeader();
                 _painter.DrawSystemEntries(_entryInfos);
+                _painter.DrawEntryInfo(_entryInfos[_selectedItemIndex]);
 
                 if (AutoShowSelectedItem)
                 {
@@ -84,6 +85,8 @@ namespace FileManager.ConsoleUI
             HideSelectedItem();
             _selectedItemIndex--;
             ShowSelectedItem();
+
+            _painter.DrawEntryInfo(_entryInfos[_selectedItemIndex]);
         }
 
         public void MoveDown()
@@ -93,6 +96,8 @@ namespace FileManager.ConsoleUI
             HideSelectedItem();
             _selectedItemIndex++;
             ShowSelectedItem();
+
+            _painter.DrawEntryInfo(_entryInfos[_selectedItemIndex]);
         }
 
         public void Execute()
@@ -148,6 +153,7 @@ namespace FileManager.ConsoleUI
             _painter.DrawPath(_directoryManager.Path);
             _painter.ClearSystemEntries();
             _painter.DrawSystemEntries(_entryInfos);
+            _painter.DrawEntryInfo(_entryInfos[_selectedItemIndex]);
 
             if (AutoShowSelectedItem)
             {

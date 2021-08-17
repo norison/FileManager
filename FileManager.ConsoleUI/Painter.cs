@@ -78,6 +78,13 @@ namespace FileManager.ConsoleUI
             }
         }
 
+        public void DrawEntryInfo(EntryInfo entryInfo)
+        {
+            SetSecondaryColor();
+            PrintEntryInfoName(entryInfo.Name);
+            PrintEntryInfoSizeAndTime(entryInfo);
+        }
+
         public void ClearPath()
         {
             SetSecondaryColor();
@@ -140,6 +147,8 @@ namespace FileManager.ConsoleUI
 
         #region Private Methods
 
+        #region Colors
+
         private void SetColorByEntryType(EntryInfo entryInfo)
         {
             var extension = entryInfo.Extenstion;
@@ -188,6 +197,10 @@ namespace FileManager.ConsoleUI
             Console.BackgroundColor = ConsoleColor.DarkBlue;
             Console.ForegroundColor = ConsoleColor.Yellow;
         }
+
+        #endregion
+
+        #region Border
 
         private void DrawTopLines()
         {
@@ -278,16 +291,9 @@ namespace FileManager.ConsoleUI
             }
         }
 
-        private string GetResizedPath(string path)
-        {
-            if (path.Length < _settings.PathMaxLength)
-            {
-                return path;
-            }
+        #endregion
 
-            var length = path.Length - _settings.WindowWidth + 5;
-            return path.Replace(path.Substring(4, length), "...");
-        }
+        #region Path
 
         private int GetPathStartPosition(string path)
         {
@@ -299,41 +305,48 @@ namespace FileManager.ConsoleUI
             return _settings.PathStartPosition;
         }
 
+        private string GetResizedPath(string path)
+        {
+            if (path.Length < _settings.PathMaxLength)
+            {
+                return path;
+            }
+
+            var length = path.Length - _settings.WindowWidth + 5;
+            return path.Replace(path.Substring(4, length), "...");
+        }
+
+        #endregion
+
+        #region Entry
+
+        private void PrintEntryInfoName(string entryName)
+        {
+            var position = _settings.LeftEntriesStartPosition;
+            var top = Console.WindowHeight - 2;
+            var maxLength = _settings.EntryInfoNameMaxLength;
+
+            var resizedEntryName = GetResizedField(entryName, maxLength);
+
+            ClearField(position, top, maxLength);
+            PrintField(position, top, resizedEntryName);
+        }
+
+        private void PrintEntryInfoSizeAndTime(EntryInfo entryInfo)
+        {
+            
+        }
+
         private void PrintEntry(int index, EntryInfo entryInfo)
         {
             var top = GetEntryTopPosition(index);
             var startPosition = GetEntryStartPosition(index);
             var maxLength = GetEntryMaxLength(index);
 
-            var resizedEntryName = GetResizedEntryName(entryInfo.Name, maxLength);
+            var resizedEntryName = GetResizedField(entryInfo.Name, maxLength);
 
             ClearField(startPosition, top, maxLength);
             PrintField(startPosition, top, resizedEntryName);
-        }
-
-        private string GetResizedEntryName(string name, int maxLength)
-        {
-            if (name.Length > _settings.LeftEntryMaxLength)
-            {
-                return name.Substring(0, maxLength) + "}";
-            }
-
-            return name;
-        }
-
-        private void ClearField(int startPosition, int top, int length)
-        {
-            Console.SetCursorPosition(startPosition, top);
-            for (var i = 0; i <= length; i++)
-            {
-                Console.Write(' ');
-            }
-        }
-
-        private void PrintField(int startPosition, int top, string text)
-        {
-            Console.SetCursorPosition(startPosition, top);
-            Console.Write(text);
         }
 
         private int GetEntryTopPosition(int index)
@@ -356,6 +369,37 @@ namespace FileManager.ConsoleUI
                 ? _settings.LeftEntryMaxLength
                 : _settings.RightEntryMaxLength;
         }
+
+        #endregion
+
+        #region Common
+
+        private string GetResizedField(string field, int maxLength)
+        {
+            if (field.Length > maxLength)
+            {
+                return field.Substring(0, maxLength) + "}";
+            }
+
+            return field;
+        }
+
+        private void ClearField(int startPosition, int top, int length)
+        {
+            Console.SetCursorPosition(startPosition, top);
+            for (var i = 0; i <= length; i++)
+            {
+                Console.Write(' ');
+            }
+        }
+
+        private void PrintField(int startPosition, int top, string text)
+        {
+            Console.SetCursorPosition(startPosition, top);
+            Console.Write(text);
+        }
+
+        #endregion
 
         #endregion
     }

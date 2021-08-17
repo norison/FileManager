@@ -18,5 +18,6 @@ namespace FileManager.ConsoleUI.Settings
         public int RightEntriesStartPosition => CenterPosition + 1;
         public int LeftEntryMaxLength => CenterPosition - LeftBorderPosition - 2;
         public int RightEntryMaxLength => Console.WindowWidth - CenterPosition - 3;
+        public int EntryInfoNameMaxLength => CenterPosition - LeftBorderPosition - 2;
     }
 }

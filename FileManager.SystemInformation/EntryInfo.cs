@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace FileManager.SystemInformation
 {
@@ -8,5 +9,7 @@ namespace FileManager.SystemInformation
         public string FullPath { get; set; }
         public FileAttributes Attributes { get; set; }
         public string Extenstion { get; set; }
+        public DateTime CreationTime { get; set; }
+        public long Bytes { get; set; }
     }
 }
