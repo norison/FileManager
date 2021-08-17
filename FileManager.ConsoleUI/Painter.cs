@@ -85,6 +85,17 @@ namespace FileManager.ConsoleUI
             PrintEntryInfoSizeAndTime(entryInfo);
         }
 
+        public void ClearEntryInfo()
+        {
+            SetSecondaryColor();
+
+            var startPosition = _settings.LeftEntriesStartPosition;
+            var top = Console.WindowHeight - 2;
+            var length = _settings.RightBorderPosition - _settings.LeftBorderPosition - 2;
+
+            ClearField(startPosition, top, length);
+        }
+
         public void ClearPath()
         {
             SetSecondaryColor();
@@ -134,12 +145,14 @@ namespace FileManager.ConsoleUI
         public void HighlightEntry(int index, EntryInfo entryInfo)
         {
             SetShowedEntryColor();
+            ClearEntry(index);
             PrintEntry(index, entryInfo);
         }
 
         public void DehighlightEntry(int index, EntryInfo entryInfo)
         {
             SetColorByEntryType(entryInfo);
+            ClearEntry(index);
             PrintEntry(index, entryInfo);
         }
 
@@ -328,13 +341,15 @@ namespace FileManager.ConsoleUI
 
             var resizedEntryName = GetResizedField(entryName, maxLength);
 
-            ClearField(position, top, maxLength);
             PrintField(position, top, resizedEntryName);
         }
 
         private void PrintEntryInfoSizeAndTime(EntryInfo entryInfo)
         {
-            
+            var text = GetEntryInfoText(entryInfo);
+            var resizedText = GetResizedField(text, _settings.RightEntryMaxLength);
+
+            PrintField(_settings.RightBorderPosition - resizedText.Length, Console.WindowHeight - 2, resizedText);
         }
 
         private void PrintEntry(int index, EntryInfo entryInfo)
@@ -345,8 +360,16 @@ namespace FileManager.ConsoleUI
 
             var resizedEntryName = GetResizedField(entryInfo.Name, maxLength);
 
-            ClearField(startPosition, top, maxLength);
             PrintField(startPosition, top, resizedEntryName);
+        }
+
+        private void ClearEntry(int index)
+        {
+            var top = GetEntryTopPosition(index);
+            var startPosition = GetEntryStartPosition(index);
+            var maxLength = GetEntryMaxLength(index);
+
+            ClearField(startPosition, top, maxLength);
         }
 
         private int GetEntryTopPosition(int index)
@@ -368,6 +391,38 @@ namespace FileManager.ConsoleUI
             return index + 2 < Console.WindowHeight - 3
                 ? _settings.LeftEntryMaxLength
                 : _settings.RightEntryMaxLength;
+        }
+
+        private string GetUserFriendlyBytes(long bytes)
+        {
+            var bytesStr = bytes.ToString();
+
+            return bytesStr.Length switch
+            {
+                <= 6 and >= 4 => $"{bytes / 1024}K",
+                >= 7 and <= 9 => $"{bytes / 1024 / 1024}M",
+                > 9 => $"{bytes / 1024 / 1024 / 1024}G",
+                _ => $"{bytes}B"
+            };
+        }
+
+        private string GetEntryInfoText(EntryInfo entryInfo)
+        {
+            var output = string.Empty;
+
+            if (IsEntryDirectory(entryInfo))
+            {
+                output += "Folder";
+            }
+            else
+            {
+                output += GetUserFriendlyBytes(entryInfo.Bytes);
+            }
+
+            output += " ";
+            output += entryInfo.CreationTime;
+
+            return output;
         }
 
         #endregion
@@ -397,6 +452,11 @@ namespace FileManager.ConsoleUI
         {
             Console.SetCursorPosition(startPosition, top);
             Console.Write(text);
+        }
+
+        private bool IsEntryDirectory(EntryInfo entryInfo)
+        {
+            return (entryInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory;
         }
 
         #endregion

@@ -10,6 +10,7 @@ namespace FileManager.ConsoleUI.Interfaces
         void DrawHeader();
         void DrawSystemEntries(IList<EntryInfo> entryInfos);
         void DrawEntryInfo(EntryInfo entryInfo);
+        void ClearEntryInfo();
         void ClearPath();
         void ClearSystemEntries();
         void ClearWindow();
