@@ -6,11 +6,11 @@ namespace FileManager.ConsoleUI.Settings
     public abstract class AbstractWindowSettings : IWindowSettings
     {
         public int WindowHeight => Console.WindowHeight;
-        public int EntryInfosHeight => Console.WindowHeight - 2;
-        public int EntryMaxHeight => Console.WindowHeight - 3;
+        public int EntryInfosHeight => WindowHeight - 2;
+        public int EntryMaxHeight => WindowHeight - 3;
         public int EntryStartHeight => 2;
-        public int EntryInfoLength => RightBorderPosition - LeftBorderPosition - 2;
-        public int BottomBorderHeight => Console.WindowHeight - 1;
+        public int EntryInfoLength => RightBorderPosition - LeftBorderPosition - EntryStartHeight;
+        public int BottomBorderHeight => WindowHeight - 1;
         public int EntriesLength => EntryMaxHeight - EntryStartHeight;
 
         public abstract int MaxEntriesLength { get; }
