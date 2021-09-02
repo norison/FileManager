@@ -1,10 +1,10 @@
 ﻿using FileManager.ConsoleUI.Constants;
-using FileManager.SystemInformation;
+using FileManager.Core.Interfaces;
+using FileManager.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FileManager.Core.Interfaces;
-using FileManager.Models;
+using FileManager.ConsoleUI.Color;
 
 namespace FileManager.ConsoleUI
 {
@@ -13,238 +13,34 @@ namespace FileManager.ConsoleUI
         #region Private Fields
 
         private readonly IWindowSettings _settings;
+        private readonly IColorant _colorant;
+        private readonly string _headerValue = "Name";
 
         #endregion
 
         #region Constructor
 
-        public ConsoleWindowPresenter(IWindowSettings settings)
+        public ConsoleWindowPresenter(IWindowSettings settings, IColorant colorant)
         {
             _settings = settings;
+            _colorant = colorant;
         }
 
         #endregion
 
-        #region Public Methods
+        #region Methods
+
+        #region Border
 
         public void ShowBorder()
         {
-            SetSecondaryColor();
+            _colorant.SetBorderColor();
 
             DrawTopLines();
             DrawVerticalLines();
             DrawHorizontalLines();
             DrawBottomLines();
         }
-
-        public void ShowPath(string path)
-        {
-            SetPrimaryColor();
-
-            var pathWithSpaces = $" {path} ";
-            var position = GetPathStartPosition(pathWithSpaces);
-            var resizedPath = GetResizedPath(pathWithSpaces);
-
-            Console.SetCursorPosition(position, Console.WindowTop);
-            Console.Write(resizedPath);
-        }
-
-        public void ShowHeader()
-        {
-            SetHeaderColor();
-
-            var value = "Name";
-            var valueCenter = value.Length / 2;
-
-            Console.SetCursorPosition(_settings.LeftHeaderPosition - valueCenter, 1);
-            Console.Write(value);
-
-            Console.SetCursorPosition(_settings.RightHeaderPosition - valueCenter, 1);
-            Console.Write(value);
-        }
-
-        public void ShowSystemEntries(IList<EntryInfo> entryInfos)
-        {
-            SetPrimaryColor();
-
-            for (var i = 0; i < entryInfos.Count; i++)
-            {
-                if (i >= _settings.MaxEntriesLength)
-                {
-                    break;
-                }
-
-                SetColorByEntryType(entryInfos[i]);
-                PrintEntry(i, entryInfos[i]);
-            }
-        }
-
-        public void ShowEntryInfo(EntryInfo entryInfo)
-        {
-            SetSecondaryColor();
-            PrintEntryInfoName(entryInfo.Name);
-            PrintEntryInfoSizeAndTime(entryInfo);
-        }
-
-        public void ClearEntryInfo()
-        {
-            SetSecondaryColor();
-            ClearField(_settings.LeftEntriesStartPosition, _settings.EntryInfosHeight, _settings.EntryInfoLength);
-        }
-
-        public void ClearPath()
-        {
-            SetSecondaryColor();
-
-            Console.SetCursorPosition(_settings.PathStartPosition, 0);
-
-            for (int i = 0; i < _settings.PathMaxLength; i++)
-            {
-                Console.Write(BorderSymbols.HorizontalStraightLine);
-            }
-        }
-
-        public void ClearSystemEntries()
-        {
-            SetPrimaryColor();
-
-            for (int i = 0; i < _settings.MaxEntriesLength; i++)
-            {
-                var top = GetEntryTopPosition(i);
-                var startPosition = GetEntryStartPosition(i);
-                var length = GetEntryMaxLength(i);
-
-                ClearField(startPosition, top, length);
-            }
-        }
-
-        public void ClearWindow()
-        {
-            SetPrimaryColor();
-
-            Console.SetCursorPosition(_settings.LeftBorderPosition, 0);
-
-            for (var i = 0; i < _settings.WindowHeight; i++)
-            {
-                for (var j = _settings.LeftBorderPosition; j <= _settings.RightBorderPosition; j++)
-                {
-                    Console.Write(' ');
-                }
-
-                Console.CursorLeft = _settings.LeftBorderPosition;
-                Console.CursorTop++;
-            }
-
-            Console.CursorVisible = false;
-        }
-
-        public void HighlightEntry(int index, IList<EntryInfo> entryInfos)
-        {
-            if (index >= _settings.MaxEntriesLength - 1)
-            {
-                ClearSystemEntries();
-
-                SetPrimaryColor();
-
-                for (var i = 0; i < _settings.MaxEntriesLength; i++)
-                {
-                    if (i == _settings.MaxEntriesLength)
-                    {
-                        break;
-                    }
-
-                    SetColorByEntryType(entryInfos[index - _settings.MaxEntriesLength + 1 + i]);
-                    PrintEntry(i, entryInfos[index - _settings.MaxEntriesLength + 1 + i]);
-                }
-
-                SetShowedEntryColor();
-                ClearEntry(_settings.MaxEntriesLength - 1);
-                PrintEntry(_settings.MaxEntriesLength - 1, entryInfos[index]);
-            }
-            else
-            {
-                SetShowedEntryColor();
-                ClearEntry(index);
-                PrintEntry(index, entryInfos[index]);
-            }
-        }
-
-        public void DehighlightEntry(int index, IList<EntryInfo> entryInfos)
-        {
-            var entryInfo = entryInfos[index];
-
-            if (index >= _settings.MaxEntriesLength - 1)
-            {
-                SetColorByEntryType(entryInfo);
-                ClearEntry(_settings.MaxEntriesLength - 1);
-                PrintEntry(_settings.MaxEntriesLength - 1, entryInfo);
-            }
-            else
-            {
-                SetColorByEntryType(entryInfo);
-                ClearEntry(index);
-                PrintEntry(index, entryInfo);
-            }
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        #region Colors
-
-        private void SetColorByEntryType(EntryInfo entryInfo)
-        {
-            var extension = entryInfo.Extenstion;
-            var attributes = entryInfo.Attributes;
-
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-
-            if (extension == ".exe" && (attributes & FileAttributes.Directory) != FileAttributes.Directory)
-                Console.ForegroundColor = ConsoleColor.Green;
-            else if (extension == ".cmd" && (attributes & FileAttributes.Directory) != FileAttributes.Directory)
-                Console.ForegroundColor = ConsoleColor.Green;
-            else if (extension == ".pak" && (attributes & FileAttributes.Directory) != FileAttributes.Directory)
-                Console.ForegroundColor = ConsoleColor.Magenta;
-            else if ((attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
-                Console.ForegroundColor = ConsoleColor.Blue;
-            else if ((attributes & FileAttributes.System) == FileAttributes.System)
-                Console.ForegroundColor = ConsoleColor.Blue;
-            else if ((attributes & FileAttributes.Normal) == FileAttributes.Normal)
-                Console.ForegroundColor = ConsoleColor.Cyan;
-            else if ((attributes & FileAttributes.Archive) == FileAttributes.Archive)
-                Console.ForegroundColor = ConsoleColor.Cyan;
-            else if ((attributes & FileAttributes.Directory) == FileAttributes.Directory)
-                Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        private void SetPrimaryColor()
-        {
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        private void SetSecondaryColor()
-        {
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.Cyan;
-        }
-
-        private void SetShowedEntryColor()
-        {
-            Console.BackgroundColor = ConsoleColor.Cyan;
-            Console.ForegroundColor = ConsoleColor.Black;
-        }
-
-        private void SetHeaderColor()
-        {
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-        }
-
-        #endregion
-
-        #region Border
 
         private void DrawTopLines()
         {
@@ -339,6 +135,18 @@ namespace FileManager.ConsoleUI
 
         #region Path
 
+        public void ShowPath(string path)
+        {
+            _colorant.SetPathColor();
+
+            var pathWithSpaces = $" {path} ";
+            var position = GetPathStartPosition(pathWithSpaces);
+            var resizedPath = GetResizedPath(pathWithSpaces);
+
+            Console.SetCursorPosition(position, Console.WindowTop);
+            Console.Write(resizedPath);
+        }
+
         private int GetPathStartPosition(string path)
         {
             if (path.Length < _settings.PathMaxLength)
@@ -360,21 +168,58 @@ namespace FileManager.ConsoleUI
             return path.Replace(path.Substring(4, length), "...");
         }
 
+        public void ClearPath()
+        {
+            _colorant.SetBorderColor();
+
+            Console.SetCursorPosition(_settings.PathStartPosition, 0);
+
+            for (int i = 0; i < _settings.PathMaxLength; i++)
+            {
+                Console.Write(BorderSymbols.HorizontalStraightLine);
+            }
+        }
+
+        #endregion
+
+        #region Header
+
+        public void ShowHeader()
+        {
+            _colorant.SetHeaderColor();
+
+            ShowHeader(_settings.LeftHeaderPosition);
+            ShowHeader(_settings.RightHeaderPosition);
+        }
+
+        private void ShowHeader(int position)
+        {
+            Console.SetCursorPosition(position - _headerValue.Length / 2, 1);
+            Console.Write(_headerValue);
+        }
+
+        public void ClearHeader()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region Entries
 
-        private void PrintEntryInfoName(string entryName)
+        public void ShowSystemEntries(IList<EntryInfo> entryInfos)
         {
-            var resizedEntryName = GetResizedField(entryName, _settings.EntryInfoNameMaxLength);
-            PrintField(_settings.LeftEntriesStartPosition, _settings.EntryInfosHeight, resizedEntryName);
-        }
+            for (var i = 0; i < entryInfos.Count; i++)
+            {
+                if (i >= _settings.MaxEntriesLength)
+                {
+                    break;
+                }
 
-        private void PrintEntryInfoSizeAndTime(EntryInfo entryInfo)
-        {
-            var text = GetEntryInfoText(entryInfo);
-            var resizedText = GetResizedField(text, _settings.RightEntryMaxLength);
-            PrintField(_settings.RightBorderPosition - resizedText.Length, _settings.EntryInfosHeight, resizedText);
+                var entryInfo = entryInfos[i];
+                _colorant.SetColorByEntryType(entryInfo);
+                PrintEntry(i, entryInfo);
+            }
         }
 
         private void PrintEntry(int index, EntryInfo entryInfo)
@@ -386,15 +231,6 @@ namespace FileManager.ConsoleUI
             var resizedEntryName = GetResizedField(entryInfo.Name, maxLength);
 
             PrintField(startPosition, top, resizedEntryName);
-        }
-
-        private void ClearEntry(int index)
-        {
-            var top = GetEntryTopPosition(index);
-            var startPosition = GetEntryStartPosition(index);
-            var maxLength = GetEntryMaxLength(index);
-
-            ClearField(startPosition, top, maxLength);
         }
 
         private int GetEntryTopPosition(int index)
@@ -424,17 +260,106 @@ namespace FileManager.ConsoleUI
                 : _settings.RightEntryMaxLength;
         }
 
-        private string GetUserFriendlyBytes(long bytes)
+        public void ClearSystemEntries()
         {
-            var bytesStr = bytes.ToString();
+            _colorant.SetWindowColor();
 
-            return bytesStr.Length switch
+            for (int i = 0; i < _settings.MaxEntriesLength; i++)
             {
-                <= 6 and >= 4 => $"{bytes / 1024}K",
-                >= 7 and <= 9 => $"{bytes / 1024 / 1024}M",
-                > 9 => $"{bytes / 1024 / 1024 / 1024}G",
-                _ => $"{bytes}B"
-            };
+                var top = GetEntryTopPosition(i);
+                var startPosition = GetEntryStartPosition(i);
+                var length = GetEntryMaxLength(i);
+
+                ClearField(startPosition, top, length);
+            }
+        }
+
+        public void HighlightEntry(int index, IList<EntryInfo> entryInfos)
+        {
+            if (index >= _settings.MaxEntriesLength - 1)
+            {
+                ClearSystemEntries();
+
+                for (var i = 0; i < _settings.MaxEntriesLength; i++)
+                {
+                    if (i == _settings.MaxEntriesLength)
+                    {
+                        break;
+                    }
+
+                    var entryInfo = entryInfos[index - _settings.MaxEntriesLength + 1 + i];
+
+                    if (i == _settings.MaxEntriesLength - 1)
+                    {
+                        _colorant.SetHighlightedEntryColor();
+                    }
+                    else
+                    {
+                        _colorant.SetColorByEntryType(entryInfo);
+                    }
+
+                    PrintEntry(i, entryInfo);
+                }
+            }
+            else
+            {
+                _colorant.SetHighlightedEntryColor();
+
+                ClearEntry(index);
+                PrintEntry(index, entryInfos[index]);
+            }
+        }
+
+        public void DehighlightEntry(int index, IList<EntryInfo> entryInfos)
+        {
+            var entryInfo = entryInfos[index];
+
+            if (index >= _settings.MaxEntriesLength - 1)
+            {
+                _colorant.SetColorByEntryType(entryInfo);
+                ClearEntry(_settings.MaxEntriesLength - 1);
+                PrintEntry(_settings.MaxEntriesLength - 1, entryInfo);
+            }
+            else
+            {
+                _colorant.SetColorByEntryType(entryInfo);
+                ClearEntry(index);
+                PrintEntry(index, entryInfo);
+            }
+        }
+
+        private void ClearEntry(int index)
+        {
+            var top = GetEntryTopPosition(index);
+            var startPosition = GetEntryStartPosition(index);
+            var maxLength = GetEntryMaxLength(index);
+
+            ClearField(startPosition, top, maxLength);
+        }
+
+        #endregion
+
+        #region EntryInfo
+
+        public void ShowEntryInfo(EntryInfo entryInfo)
+        {
+            _colorant.SetEntryInfoColor();
+
+            PrintEntryInfoName(entryInfo.Name);
+            PrintEntryInfoSizeAndTime(entryInfo);
+        }
+
+        private void PrintEntryInfoName(string entryName)
+        {
+            var resizedEntryName = GetResizedField(entryName, _settings.EntryInfoNameMaxLength);
+            PrintField(_settings.LeftEntriesStartPosition, _settings.EntryInfosHeight, resizedEntryName);
+        }
+
+        private void PrintEntryInfoSizeAndTime(EntryInfo entryInfo)
+        {
+            var text = GetEntryInfoText(entryInfo);
+            var resizedText = GetResizedField(text, _settings.RightEntryMaxLength);
+            PrintField(_settings.RightBorderPosition - resizedText.Length, _settings.EntryInfosHeight, resizedText);
         }
 
         private string GetEntryInfoText(EntryInfo entryInfo)
@@ -461,9 +386,48 @@ namespace FileManager.ConsoleUI
             return (entryInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory;
         }
 
+        private string GetUserFriendlyBytes(long bytes)
+        {
+            var bytesStr = bytes.ToString();
+
+            return bytesStr.Length switch
+            {
+                <= 6 and >= 4 => $"{bytes / 1024}K",
+                >= 7 and <= 9 => $"{bytes / 1024 / 1024}M",
+                > 9 => $"{bytes / 1024 / 1024 / 1024}G",
+                _ => $"{bytes}B"
+            };
+        }
+
+        public void ClearEntryInfo()
+        {
+            _colorant.SetWindowColor();
+            ClearField(_settings.LeftEntriesStartPosition, _settings.EntryInfosHeight, _settings.EntryInfoLength);
+        }
+
         #endregion
 
         #region Common
+
+        public void ClearWindow()
+        {
+            _colorant.SetWindowColor();
+
+            Console.SetCursorPosition(_settings.LeftBorderPosition, 0);
+
+            for (var i = 0; i < _settings.WindowHeight; i++)
+            {
+                for (var j = _settings.LeftBorderPosition; j <= _settings.RightBorderPosition; j++)
+                {
+                    Console.Write(' ');
+                }
+
+                Console.CursorLeft = _settings.LeftBorderPosition;
+                Console.CursorTop++;
+            }
+
+            Console.CursorVisible = false;
+        }
 
         private string GetResizedField(string field, int maxLength)
         {
@@ -475,6 +439,12 @@ namespace FileManager.ConsoleUI
             return field;
         }
 
+        private void PrintField(int startPosition, int top, string text)
+        {
+            Console.SetCursorPosition(startPosition, top);
+            Console.Write(text);
+        }
+
         private void ClearField(int startPosition, int top, int length)
         {
             Console.SetCursorPosition(startPosition, top);
@@ -482,12 +452,6 @@ namespace FileManager.ConsoleUI
             {
                 Console.Write(' ');
             }
-        }
-
-        private void PrintField(int startPosition, int top, string text)
-        {
-            Console.SetCursorPosition(startPosition, top);
-            Console.Write(text);
         }
 
         #endregion

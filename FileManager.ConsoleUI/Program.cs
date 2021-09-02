@@ -1,4 +1,5 @@
 ﻿using System;
+using FileManager.ConsoleUI.Color;
 using FileManager.ConsoleUI.Settings;
 using FileManager.Core;
 using FileManager.Core.Interfaces;
@@ -15,8 +16,10 @@ namespace FileManager.ConsoleUI
             IFileSystem leftFileSystem = new FileSystem(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
             IFileSystem rightFileSystem = new FileSystem(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
 
-            IWindowPresenter leftWindowPresenter = new ConsoleWindowPresenter(new LeftWindowSettings());
-            IWindowPresenter rightWindowPresenter = new ConsoleWindowPresenter(new RightWindowSettings());
+            IColorant colorant = new Colorant();
+
+            IWindowPresenter leftWindowPresenter = new ConsoleWindowPresenter(new LeftWindowSettings(), colorant);
+            IWindowPresenter rightWindowPresenter = new ConsoleWindowPresenter(new RightWindowSettings(), colorant);
 
             IWindowSizeMonitoring windowSizeMonitoring = new WindowSizeMonitoring(1000);
 
