@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace FileManager.SystemInformation
+namespace FileManager.Models
 {
     public class EntryInfo
     {

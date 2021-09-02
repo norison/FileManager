@@ -1,6 +1,7 @@
 ﻿using System;
-using FileManager.ConsoleUI.Interfaces;
 using FileManager.ConsoleUI.Settings;
+using FileManager.Core;
+using FileManager.Core.Interfaces;
 using FileManager.SystemInformation;
 
 namespace FileManager.ConsoleUI
@@ -11,18 +12,20 @@ namespace FileManager.ConsoleUI
         {
             SetupConsole();
 
-            IDirectoryManager leftDirectoryManager = new DirectoryManager(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
-            IDirectoryManager rightDirectoryManager = new DirectoryManager(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+            IFileSystem leftFileSystem = new FileSystem(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+            IFileSystem rightFileSystem = new FileSystem(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
 
-            IPainter leftWindowPainter = new Painter(new LeftWindowSettings());
-            IPainter rightWindowPainter = new Painter(new RightWindowSettings());
+            IWindowPresenter leftWindowPresenter = new ConsoleWindowPresenter(new LeftWindowSettings());
+            IWindowPresenter rightWindowPresenter = new ConsoleWindowPresenter(new RightWindowSettings());
 
             IWindowSizeMonitoring windowSizeMonitoring = new WindowSizeMonitoring(1000);
 
-            IWindowManager leftWindowManager = new WindowManager(windowSizeMonitoring, leftDirectoryManager, leftWindowPainter);
-            IWindowManager rightWindowManager = new WindowManager(windowSizeMonitoring, rightDirectoryManager, rightWindowPainter);
+            IWindow leftWindow = new Window(windowSizeMonitoring, leftFileSystem, leftWindowPresenter);
+            IWindow rightWindow = new Window(windowSizeMonitoring, rightFileSystem, rightWindowPresenter);
 
-            IFileManager fileManager = new FileManager(leftWindowManager, rightWindowManager);
+            ICommandManager commandManager = new ConsoleCommandManager();
+
+            IFileManager fileManager = new Core.FileManager(leftWindow, rightWindow, commandManager);
 
             windowSizeMonitoring.Start();
             fileManager.Start();

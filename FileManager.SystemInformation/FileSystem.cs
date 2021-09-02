@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FileManager.Core.Interfaces;
+using FileManager.Models;
 
 namespace FileManager.SystemInformation
 {
-    public class DirectoryManager : IDirectoryManager
+    public class FileSystem : IFileSystem
     {
         #region Private Fields
 
@@ -22,7 +24,7 @@ namespace FileManager.SystemInformation
 
         #region Constructor
 
-        public DirectoryManager(string path)
+        public FileSystem(string path)
         {
             Setup(path);
         }

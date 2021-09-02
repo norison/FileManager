@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FileManager.Core\FileManager.Core.csproj" />
+    <ProjectReference Include="..\FileManager.Models\FileManager.Models.csproj" />
   </ItemGroup>
 
 </Project>

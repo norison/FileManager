@@ -1,4 +1,4 @@
-﻿namespace FileManager.ConsoleUI.Interfaces
+﻿namespace FileManager.Core.Interfaces
 {
     public interface IWindowSettings
     {

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using FileManager.Models;
 
-namespace FileManager.SystemInformation
+namespace FileManager.Core.Interfaces
 {
-    public interface IDirectoryManager
+    public interface IFileSystem
     {
         string Path { get; }
         bool IsRoot { get; }

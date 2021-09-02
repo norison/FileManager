@@ -1,17 +1,18 @@
-﻿using FileManager.ConsoleUI.Interfaces;
-using FileManager.SystemInformation;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using FileManager.Core.Interfaces;
+using FileManager.Models;
 
-namespace FileManager.ConsoleUI
+namespace FileManager.Core
 {
-    public class WindowManager : IWindowManager
+    public class Window : IWindow
     {
         #region Private Fields
 
         private readonly IWindowSizeMonitoring _windowSizeMonitoring;
-        private readonly IDirectoryManager _directoryManager;
-        private readonly IPainter _painter;
+        private readonly IFileSystem _fileSystem;
+        private readonly IWindowPresenter _windowPresenter;
 
         private IList<EntryInfo> _entryInfos;
         private int _selectedItemIndex;
@@ -26,11 +27,11 @@ namespace FileManager.ConsoleUI
 
         #region Constructor
 
-        public WindowManager(IWindowSizeMonitoring windowSizeMonitoring, IDirectoryManager directoryManager, IPainter painter)
+        public Window(IWindowSizeMonitoring windowSizeMonitoring, IFileSystem fileSystem, IWindowPresenter windowPresenter)
         {
             _windowSizeMonitoring = windowSizeMonitoring;
-            _directoryManager = directoryManager;
-            _painter = painter;
+            _fileSystem = fileSystem;
+            _windowPresenter = windowPresenter;
 
             _windowSizeMonitoring.WindowSizeChanged += WindowSizeMonitoringOnWindowSizeChanged;
 
@@ -49,22 +50,27 @@ namespace FileManager.ConsoleUI
 
         private void WindowSizeMonitoringOnWindowSizeChanged()
         {
-            DrawWindow();
+            ShowWindow();
         }
 
         #endregion
 
         #region Public Methods
 
-        public void DrawWindow()
+        public void ShowWindow()
         {
             try
             {
-                _painter.ClearWindow();
-                _painter.DrawBorder();
-                _painter.DrawHeader();
+                _windowPresenter.ClearWindow();
+                _windowPresenter.ShowBorder();
+                _windowPresenter.ShowHeader();
+                _windowPresenter.ShowPath(_fileSystem.Path);
+                _windowPresenter.ShowSystemEntries(_entryInfos);
 
-                UpdateWindowElements();
+                if (AutoShowSelectedItem)
+                {
+                    ShowSelectedItem();
+                }
             }
             catch
             {
@@ -96,11 +102,15 @@ namespace FileManager.ConsoleUI
 
             if (info.Name == "..")
             {
-                _directoryManager.GoToParent();
+                _fileSystem.GoToParent();
             }
             else if ((info.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
             {
-                _directoryManager.ChangeDirectory(info.FullPath);
+                _fileSystem.ChangeDirectory(info.FullPath);
+            }
+            else
+            {
+                Process.Start(new ProcessStartInfo { FileName = info.FullPath, UseShellExecute = true });
             }
 
             ClearWindowElements();
@@ -109,18 +119,16 @@ namespace FileManager.ConsoleUI
 
         public void ShowSelectedItem()
         {
-            var entryInfo = _entryInfos[_selectedItemIndex];
-            _painter.HighlightEntry(_selectedItemIndex, entryInfo);
-            _painter.ClearEntryInfo();
-            _painter.DrawEntryInfo(entryInfo);
+            _windowPresenter.HighlightEntry(_selectedItemIndex, _entryInfos);
+            _windowPresenter.ClearEntryInfo();
+            _windowPresenter.ShowEntryInfo(_entryInfos[_selectedItemIndex]);
         }
 
         public void HideSelectedItem()
         {
-            var entryInfo = _entryInfos[_selectedItemIndex];
-            _painter.DehighlightEntry(_selectedItemIndex, entryInfo);
-            _painter.ClearEntryInfo();
-            _painter.DrawEntryInfo(entryInfo);
+            _windowPresenter.DehighlightEntry(_selectedItemIndex, _entryInfos);
+            _windowPresenter.ClearEntryInfo();
+            _windowPresenter.ShowEntryInfo(_entryInfos[_selectedItemIndex]);
         }
 
         #endregion
@@ -129,9 +137,9 @@ namespace FileManager.ConsoleUI
 
         private IList<EntryInfo> GetEntryInfosAddingBackToParent()
         {
-            var infos = _directoryManager.GetEntryInfos();
+            var infos = _fileSystem.GetEntryInfos();
 
-            if (!_directoryManager.IsRoot)
+            if (!_fileSystem.IsRoot)
             {
                 infos.Insert(0, new EntryInfo { Name = "..", Attributes = FileAttributes.Directory });
             }
@@ -141,22 +149,30 @@ namespace FileManager.ConsoleUI
 
         private void ClearWindowElements()
         {
-            _painter.ClearPath();
-            _painter.ClearSystemEntries();
-            _painter.ClearEntryInfo();
+            _windowPresenter.ClearPath();
+            _windowPresenter.ClearSystemEntries();
+            _windowPresenter.ClearEntryInfo();
         }
 
         private void UpdateWindowElements()
         {
-            _selectedItemIndex = 0;
             _entryInfos = GetEntryInfosAddingBackToParent();
+            SetCorrectSelectedItemIndex();
 
-            _painter.DrawPath(_directoryManager.Path);
-            _painter.DrawSystemEntries(_entryInfos);
+            _windowPresenter.ShowPath(_fileSystem.Path);
+            _windowPresenter.ShowSystemEntries(_entryInfos);
 
             if (AutoShowSelectedItem)
             {
                 ShowSelectedItem();
+            }
+        }
+
+        private void SetCorrectSelectedItemIndex()
+        {
+            if (_selectedItemIndex >= _entryInfos.Count)
+            {
+                _selectedItemIndex = _entryInfos.Count - 1;
             }
         }
 

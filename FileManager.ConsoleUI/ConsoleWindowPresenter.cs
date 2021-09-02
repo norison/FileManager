@@ -3,11 +3,12 @@ using FileManager.SystemInformation;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FileManager.ConsoleUI.Interfaces;
+using FileManager.Core.Interfaces;
+using FileManager.Models;
 
 namespace FileManager.ConsoleUI
 {
-    public class Painter : IPainter
+    public class ConsoleWindowPresenter : IWindowPresenter
     {
         #region Private Fields
 
@@ -17,7 +18,7 @@ namespace FileManager.ConsoleUI
 
         #region Constructor
 
-        public Painter(IWindowSettings settings)
+        public ConsoleWindowPresenter(IWindowSettings settings)
         {
             _settings = settings;
         }
@@ -26,7 +27,7 @@ namespace FileManager.ConsoleUI
 
         #region Public Methods
 
-        public void DrawBorder()
+        public void ShowBorder()
         {
             SetSecondaryColor();
 
@@ -36,7 +37,7 @@ namespace FileManager.ConsoleUI
             DrawBottomLines();
         }
 
-        public void DrawPath(string path)
+        public void ShowPath(string path)
         {
             SetPrimaryColor();
 
@@ -48,7 +49,7 @@ namespace FileManager.ConsoleUI
             Console.Write(resizedPath);
         }
 
-        public void DrawHeader()
+        public void ShowHeader()
         {
             SetHeaderColor();
 
@@ -62,7 +63,7 @@ namespace FileManager.ConsoleUI
             Console.Write(value);
         }
 
-        public void DrawSystemEntries(IList<EntryInfo> entryInfos)
+        public void ShowSystemEntries(IList<EntryInfo> entryInfos)
         {
             SetPrimaryColor();
 
@@ -78,7 +79,7 @@ namespace FileManager.ConsoleUI
             }
         }
 
-        public void DrawEntryInfo(EntryInfo entryInfo)
+        public void ShowEntryInfo(EntryInfo entryInfo)
         {
             SetSecondaryColor();
             PrintEntryInfoName(entryInfo.Name);
@@ -137,18 +138,53 @@ namespace FileManager.ConsoleUI
             Console.CursorVisible = false;
         }
 
-        public void HighlightEntry(int index, EntryInfo entryInfo)
+        public void HighlightEntry(int index, IList<EntryInfo> entryInfos)
         {
-            SetShowedEntryColor();
-            ClearEntry(index);
-            PrintEntry(index, entryInfo);
+            if (index >= _settings.MaxEntriesLength - 1)
+            {
+                ClearSystemEntries();
+
+                SetPrimaryColor();
+
+                for (var i = 0; i < _settings.MaxEntriesLength; i++)
+                {
+                    if (i == _settings.MaxEntriesLength)
+                    {
+                        break;
+                    }
+
+                    SetColorByEntryType(entryInfos[index - _settings.MaxEntriesLength + 1 + i]);
+                    PrintEntry(i, entryInfos[index - _settings.MaxEntriesLength + 1 + i]);
+                }
+
+                SetShowedEntryColor();
+                ClearEntry(_settings.MaxEntriesLength - 1);
+                PrintEntry(_settings.MaxEntriesLength - 1, entryInfos[index]);
+            }
+            else
+            {
+                SetShowedEntryColor();
+                ClearEntry(index);
+                PrintEntry(index, entryInfos[index]);
+            }
         }
 
-        public void DehighlightEntry(int index, EntryInfo entryInfo)
+        public void DehighlightEntry(int index, IList<EntryInfo> entryInfos)
         {
-            SetColorByEntryType(entryInfo);
-            ClearEntry(index);
-            PrintEntry(index, entryInfo);
+            var entryInfo = entryInfos[index];
+
+            if (index >= _settings.MaxEntriesLength - 1)
+            {
+                SetColorByEntryType(entryInfo);
+                ClearEntry(_settings.MaxEntriesLength - 1);
+                PrintEntry(_settings.MaxEntriesLength - 1, entryInfo);
+            }
+            else
+            {
+                SetColorByEntryType(entryInfo);
+                ClearEntry(index);
+                PrintEntry(index, entryInfo);
+            }
         }
 
         #endregion
@@ -326,7 +362,7 @@ namespace FileManager.ConsoleUI
 
         #endregion
 
-        #region Entry
+        #region Entries
 
         private void PrintEntryInfoName(string entryName)
         {
@@ -420,6 +456,11 @@ namespace FileManager.ConsoleUI
             return output;
         }
 
+        private bool IsEntryDirectory(EntryInfo entryInfo)
+        {
+            return (entryInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory;
+        }
+
         #endregion
 
         #region Common
@@ -447,11 +488,6 @@ namespace FileManager.ConsoleUI
         {
             Console.SetCursorPosition(startPosition, top);
             Console.Write(text);
-        }
-
-        private bool IsEntryDirectory(EntryInfo entryInfo)
-        {
-            return (entryInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory;
         }
 
         #endregion

@@ -2,7 +2,7 @@
 
 namespace FileManager.ConsoleUI.Settings
 {
-    public class LeftWindowSettings : AbstractWindowSettings
+    public class LeftWindowSettings : WindowSettingsBase
     {
         public override int WindowWidth => Console.WindowWidth / 2;
         public override int MaxEntriesLength => (Console.WindowHeight - 5) * 2;

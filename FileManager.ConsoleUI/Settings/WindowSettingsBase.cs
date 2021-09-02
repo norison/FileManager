@@ -1,9 +1,9 @@
 ﻿using System;
-using FileManager.ConsoleUI.Interfaces;
+using FileManager.Core.Interfaces;
 
 namespace FileManager.ConsoleUI.Settings
 {
-    public abstract class AbstractWindowSettings : IWindowSettings
+    public abstract class WindowSettingsBase : IWindowSettings
     {
         public int WindowHeight => Console.WindowHeight;
         public int EntryInfosHeight => WindowHeight - 2;

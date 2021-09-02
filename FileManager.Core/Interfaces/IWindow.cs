@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace FileManager.ConsoleUI.Interfaces
+namespace FileManager.Core.Interfaces
 {
-    public interface IWindowManager : IDisposable
+    public interface IWindow : IDisposable
     {
         bool AutoShowSelectedItem { get; set; }
-        void DrawWindow();
+        void ShowWindow();
         void MoveUp();
         void MoveDown();
         void Execute();

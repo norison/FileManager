@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Timers;
-using FileManager.ConsoleUI.Interfaces;
+using FileManager.Core.Interfaces;
 
 namespace FileManager.ConsoleUI
 {
