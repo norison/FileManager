@@ -3,8 +3,8 @@ using FileManager.Core.Interfaces;
 using FileManager.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using FileManager.ConsoleUI.Color;
+using FileManager.ConsoleUI.Extensions;
 
 namespace FileManager.ConsoleUI
 {
@@ -14,7 +14,6 @@ namespace FileManager.ConsoleUI
 
         private readonly IWindowSettings _settings;
         private readonly IColorant _colorant;
-        private readonly string _headerValue = "Name";
 
         #endregion
 
@@ -135,16 +134,37 @@ namespace FileManager.ConsoleUI
 
         #region Path
 
-        public void ShowPath(string path)
+        public void ShowHighlightedPath(string path)
         {
-            _colorant.SetPathColor();
+            ClearPath();
+            _colorant.SetHighlightedPathColor();
+            ShowPath(path);
+        }
 
+        public void ShowUnhighlightedPath(string path)
+        {
+            ClearPath();
+            _colorant.SetPathColor();
+            ShowPath(path);
+        }
+
+        private void ShowPath(string path)
+        {
             var pathWithSpaces = $" {path} ";
             var position = GetPathStartPosition(pathWithSpaces);
             var resizedPath = GetResizedPath(pathWithSpaces);
 
-            Console.SetCursorPosition(position, Console.WindowTop);
-            Console.Write(resizedPath);
+            PrintField(position, Console.WindowTop, resizedPath);
+        }
+
+        private void ClearPath()
+        {
+            _colorant.SetBorderColor();
+
+            var startPosition = _settings.PathStartPosition;
+            var text = new string(BorderSymbols.HorizontalStraightLine, _settings.PathMaxLength);
+
+            PrintField(startPosition, 0, text);
         }
 
         private int GetPathStartPosition(string path)
@@ -168,18 +188,6 @@ namespace FileManager.ConsoleUI
             return path.Replace(path.Substring(4, length), "...");
         }
 
-        public void ClearPath()
-        {
-            _colorant.SetBorderColor();
-
-            Console.SetCursorPosition(_settings.PathStartPosition, 0);
-
-            for (int i = 0; i < _settings.PathMaxLength; i++)
-            {
-                Console.Write(BorderSymbols.HorizontalStraightLine);
-            }
-        }
-
         #endregion
 
         #region Header
@@ -188,19 +196,14 @@ namespace FileManager.ConsoleUI
         {
             _colorant.SetHeaderColor();
 
-            ShowHeader(_settings.LeftHeaderPosition);
-            ShowHeader(_settings.RightHeaderPosition);
+            PrintHeader(_settings.LeftHeaderPosition);
+            PrintHeader(_settings.RightHeaderPosition);
         }
 
-        private void ShowHeader(int position)
+        private void PrintHeader(int position)
         {
-            Console.SetCursorPosition(position - _headerValue.Length / 2, 1);
-            Console.Write(_headerValue);
-        }
-
-        public void ClearHeader()
-        {
-            throw new NotImplementedException();
+            var centerPosition = position - _settings.HeaderValue.Length / 2;
+            PrintField(centerPosition, 1, _settings.HeaderValue);
         }
 
         #endregion
@@ -209,6 +212,8 @@ namespace FileManager.ConsoleUI
 
         public void ShowSystemEntries(IList<EntryInfo> entryInfos)
         {
+            ClearSystemEntries();
+
             for (var i = 0; i < entryInfos.Count; i++)
             {
                 if (i >= _settings.MaxEntriesLength)
@@ -219,6 +224,21 @@ namespace FileManager.ConsoleUI
                 var entryInfo = entryInfos[i];
                 _colorant.SetColorByEntryType(entryInfo);
                 PrintEntry(i, entryInfo);
+            }
+        }
+
+        private void ClearSystemEntries()
+        {
+            _colorant.SetWindowColor();
+
+            for (var i = 0; i < _settings.MaxEntriesLength; i++)
+            {
+                var top = GetEntryTopPosition(i);
+                var startPosition = GetEntryStartPosition(i);
+                var length = GetEntryMaxLength(i);
+
+                var text = new string(' ', length);
+                PrintField(startPosition, top, text);
             }
         }
 
@@ -260,20 +280,6 @@ namespace FileManager.ConsoleUI
                 : _settings.RightEntryMaxLength;
         }
 
-        public void ClearSystemEntries()
-        {
-            _colorant.SetWindowColor();
-
-            for (int i = 0; i < _settings.MaxEntriesLength; i++)
-            {
-                var top = GetEntryTopPosition(i);
-                var startPosition = GetEntryStartPosition(i);
-                var length = GetEntryMaxLength(i);
-
-                ClearField(startPosition, top, length);
-            }
-        }
-
         public void HighlightEntry(int index, IList<EntryInfo> entryInfos)
         {
             if (index >= _settings.MaxEntriesLength - 1)
@@ -282,11 +288,6 @@ namespace FileManager.ConsoleUI
 
                 for (var i = 0; i < _settings.MaxEntriesLength; i++)
                 {
-                    if (i == _settings.MaxEntriesLength)
-                    {
-                        break;
-                    }
-
                     var entryInfo = entryInfos[index - _settings.MaxEntriesLength + 1 + i];
 
                     if (i == _settings.MaxEntriesLength - 1)
@@ -334,7 +335,8 @@ namespace FileManager.ConsoleUI
             var startPosition = GetEntryStartPosition(index);
             var maxLength = GetEntryMaxLength(index);
 
-            ClearField(startPosition, top, maxLength);
+            var text = new string(' ', maxLength);
+            PrintField(startPosition, top, text);
         }
 
         #endregion
@@ -343,10 +345,21 @@ namespace FileManager.ConsoleUI
 
         public void ShowEntryInfo(EntryInfo entryInfo)
         {
+            ClearEntryInfo();
             _colorant.SetEntryInfoColor();
-
             PrintEntryInfoName(entryInfo.Name);
             PrintEntryInfoSizeAndTime(entryInfo);
+        }
+
+        private void ClearEntryInfo()
+        {
+            _colorant.SetWindowColor();
+            var startPosition = _settings.LeftEntriesStartPosition;
+            var top = _settings.EntryInfosHeight;
+            var maxLength = _settings.EntryInfoLength;
+
+            var text = new string(' ', maxLength);
+            PrintField(startPosition, top, text);
         }
 
         private void PrintEntryInfoName(string entryName)
@@ -357,52 +370,9 @@ namespace FileManager.ConsoleUI
 
         private void PrintEntryInfoSizeAndTime(EntryInfo entryInfo)
         {
-            var text = GetEntryInfoText(entryInfo);
+            var text = entryInfo.ConvertToUserFriendlyText();
             var resizedText = GetResizedField(text, _settings.RightEntryMaxLength);
             PrintField(_settings.RightBorderPosition - resizedText.Length, _settings.EntryInfosHeight, resizedText);
-        }
-
-        private string GetEntryInfoText(EntryInfo entryInfo)
-        {
-            var output = string.Empty;
-
-            if (IsEntryDirectory(entryInfo))
-            {
-                output += "Folder";
-            }
-            else
-            {
-                output += GetUserFriendlyBytes(entryInfo.Bytes);
-            }
-
-            output += " ";
-            output += entryInfo.CreationTime;
-
-            return output;
-        }
-
-        private bool IsEntryDirectory(EntryInfo entryInfo)
-        {
-            return (entryInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory;
-        }
-
-        private string GetUserFriendlyBytes(long bytes)
-        {
-            var bytesStr = bytes.ToString();
-
-            return bytesStr.Length switch
-            {
-                <= 6 and >= 4 => $"{bytes / 1024}K",
-                >= 7 and <= 9 => $"{bytes / 1024 / 1024}M",
-                > 9 => $"{bytes / 1024 / 1024 / 1024}G",
-                _ => $"{bytes}B"
-            };
-        }
-
-        public void ClearEntryInfo()
-        {
-            _colorant.SetWindowColor();
-            ClearField(_settings.LeftEntriesStartPosition, _settings.EntryInfosHeight, _settings.EntryInfoLength);
         }
 
         #endregion
@@ -433,7 +403,7 @@ namespace FileManager.ConsoleUI
         {
             if (field.Length > maxLength)
             {
-                return field.Substring(0, maxLength) + "}";
+                return field.Substring(0, maxLength - 1) + "}";
             }
 
             return field;
@@ -443,15 +413,6 @@ namespace FileManager.ConsoleUI
         {
             Console.SetCursorPosition(startPosition, top);
             Console.Write(text);
-        }
-
-        private void ClearField(int startPosition, int top, int length)
-        {
-            Console.SetCursorPosition(startPosition, top);
-            for (var i = 0; i <= length; i++)
-            {
-                Console.Write(' ');
-            }
         }
 
         #endregion

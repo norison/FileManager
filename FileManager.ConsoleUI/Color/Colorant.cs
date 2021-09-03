@@ -12,6 +12,12 @@ namespace FileManager.ConsoleUI.Color
             Console.ForegroundColor = ConsoleColor.Cyan;
         }
 
+        public void SetHighlightedPathColor()
+        {
+            Console.BackgroundColor = ConsoleColor.Cyan;
+            Console.ForegroundColor = ConsoleColor.Black;
+        }
+
         public void SetPathColor()
         {
             Console.BackgroundColor = ConsoleColor.DarkBlue;

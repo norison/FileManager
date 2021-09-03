@@ -5,6 +5,7 @@ namespace FileManager.ConsoleUI.Color
     public interface IColorant
     {
         void SetBorderColor();
+        void SetHighlightedPathColor();
         void SetPathColor();
         void SetHeaderColor();
         void SetEntryInfoColor();

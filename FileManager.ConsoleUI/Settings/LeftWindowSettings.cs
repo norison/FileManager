@@ -15,8 +15,8 @@ namespace FileManager.ConsoleUI.Settings
         public override int RightHeaderPosition => WindowWidth - WindowWidth / 4;
         public override int LeftEntriesStartPosition => 1;
         public override int RightEntriesStartPosition => CenterPosition + 1;
-        public override int LeftEntryMaxLength => CenterPosition - 2;
-        public override int RightEntryMaxLength => WindowWidth - CenterPosition - 3;
+        public override int LeftEntryMaxLength => CenterPosition - 1;
+        public override int RightEntryMaxLength => WindowWidth - CenterPosition - 2;
         public override int EntryInfoNameMaxLength => CenterPosition - LeftBorderPosition - 2;
     }
 }

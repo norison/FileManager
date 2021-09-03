@@ -1,5 +1,4 @@
-﻿using System;
-using FileManager.Core.Interfaces;
+﻿using FileManager.Core.Interfaces;
 
 namespace FileManager.Core
 {
@@ -32,7 +31,7 @@ namespace FileManager.Core
 
             _selectedWindowPart = WindowPart.First;
             _selectedWindow = _firstWindow;
-            _selectedWindow.AutoShowSelectedItem = true;
+            _selectedWindow.IsActive = true;
         }
 
         public void Dispose()
@@ -43,7 +42,7 @@ namespace FileManager.Core
 
         #endregion
 
-        #region Public Methods
+        #region Methods
 
         public void Start()
         {
@@ -77,14 +76,9 @@ namespace FileManager.Core
             }
         }
 
-        #endregion
-
-        #region Private Methods
-
         private void SwitchWindow()
         {
-            _selectedWindow.AutoShowSelectedItem = false;
-            _selectedWindow.HideSelectedItem();
+            _selectedWindow.IsActive = false;
 
             if (_selectedWindowPart == WindowPart.First)
             {
@@ -97,8 +91,7 @@ namespace FileManager.Core
                 _selectedWindow = _firstWindow;
             }
 
-            _selectedWindow.AutoShowSelectedItem = true;
-            _selectedWindow.ShowSelectedItem();
+            _selectedWindow.IsActive = true;
         }
 
         #endregion

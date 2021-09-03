@@ -2,6 +2,7 @@
 {
     public interface IWindowSettings
     {
+        string HeaderValue { get; }
         int WindowHeight { get; }
         int EntryInfosHeight { get; }
         int EntryMaxHeight { get; }

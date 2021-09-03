@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using FileManager.Core.Interfaces;
+using FileManager.Models;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using FileManager.Core.Interfaces;
-using FileManager.Models;
 
 namespace FileManager.Core
 {
@@ -14,6 +14,7 @@ namespace FileManager.Core
         private readonly IFileSystem _fileSystem;
         private readonly IWindowPresenter _windowPresenter;
 
+        private bool _isActive;
         private IList<EntryInfo> _entryInfos;
         private int _selectedItemIndex;
 
@@ -21,7 +22,25 @@ namespace FileManager.Core
 
         #region Properties
 
-        public bool AutoShowSelectedItem { get; set; }
+        public bool IsActive
+        {
+            get => _isActive;
+            set
+            {
+                _isActive = value;
+
+                if (value)
+                {
+                    _windowPresenter.HighlightEntry(_selectedItemIndex, _entryInfos);
+                    _windowPresenter.ShowHighlightedPath(_fileSystem.Path);
+                }
+                else
+                {
+                    _windowPresenter.DehighlightEntry(_selectedItemIndex, _entryInfos);
+                    _windowPresenter.ShowUnhighlightedPath(_fileSystem.Path);
+                }
+            }
+        }
 
         #endregion
 
@@ -36,7 +55,8 @@ namespace FileManager.Core
             _windowSizeMonitoring.WindowSizeChanged += WindowSizeMonitoringOnWindowSizeChanged;
 
             _selectedItemIndex = 0;
-            _entryInfos = GetEntryInfosAddingBackToParent();
+
+            UpdateEntryInfos();
         }
 
         public void Dispose()
@@ -55,7 +75,7 @@ namespace FileManager.Core
 
         #endregion
 
-        #region Public Methods
+        #region Methods
 
         public void ShowWindow()
         {
@@ -64,13 +84,8 @@ namespace FileManager.Core
                 _windowPresenter.ClearWindow();
                 _windowPresenter.ShowBorder();
                 _windowPresenter.ShowHeader();
-                _windowPresenter.ShowPath(_fileSystem.Path);
-                _windowPresenter.ShowSystemEntries(_entryInfos);
 
-                if (AutoShowSelectedItem)
-                {
-                    ShowSelectedItem();
-                }
+                UpdateWindowElements();
             }
             catch
             {
@@ -82,90 +97,85 @@ namespace FileManager.Core
         {
             if (_selectedItemIndex == 0) return;
 
-            HideSelectedItem();
+            _windowPresenter.DehighlightEntry(_selectedItemIndex, _entryInfos);
             _selectedItemIndex--;
-            ShowSelectedItem();
+            _windowPresenter.HighlightEntry(_selectedItemIndex, _entryInfos);
+            _windowPresenter.ShowEntryInfo(_entryInfos[_selectedItemIndex]);
         }
 
         public void MoveDown()
         {
             if (_selectedItemIndex == _entryInfos.Count - 1) return;
 
-            HideSelectedItem();
+            _windowPresenter.DehighlightEntry(_selectedItemIndex, _entryInfos);
             _selectedItemIndex++;
-            ShowSelectedItem();
+            _windowPresenter.HighlightEntry(_selectedItemIndex, _entryInfos);
+            _windowPresenter.ShowEntryInfo(_entryInfos[_selectedItemIndex]);
         }
 
         public void Execute()
         {
-            var info = _entryInfos[_selectedItemIndex];
-
-            if (info.Name == "..")
+            try
             {
-                _fileSystem.GoToParent();
+                var info = _entryInfos[_selectedItemIndex];
+
+                if (info.Name == "..")
+                {
+                    _fileSystem.GoToParent();
+                }
+                else if ((info.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    _fileSystem.ChangeDirectory(info.FullPath);
+                }
+                else
+                {
+                    Process.Start(new ProcessStartInfo { FileName = info.FullPath, UseShellExecute = true });
+                }
+
+                UpdateWindowElements();
             }
-            else if ((info.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+            catch
             {
-                _fileSystem.ChangeDirectory(info.FullPath);
+                // TODO: add error popup
             }
-            else
-            {
-                Process.Start(new ProcessStartInfo { FileName = info.FullPath, UseShellExecute = true });
-            }
-
-            ClearWindowElements();
-            UpdateWindowElements();
-        }
-
-        public void ShowSelectedItem()
-        {
-            _windowPresenter.HighlightEntry(_selectedItemIndex, _entryInfos);
-            _windowPresenter.ClearEntryInfo();
-            _windowPresenter.ShowEntryInfo(_entryInfos[_selectedItemIndex]);
-        }
-
-        public void HideSelectedItem()
-        {
-            _windowPresenter.DehighlightEntry(_selectedItemIndex, _entryInfos);
-            _windowPresenter.ClearEntryInfo();
-            _windowPresenter.ShowEntryInfo(_entryInfos[_selectedItemIndex]);
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private IList<EntryInfo> GetEntryInfosAddingBackToParent()
-        {
-            var infos = _fileSystem.GetEntryInfos();
-
-            if (!_fileSystem.IsRoot)
-            {
-                infos.Insert(0, new EntryInfo { Name = "..", Attributes = FileAttributes.Directory });
-            }
-
-            return infos;
-        }
-
-        private void ClearWindowElements()
-        {
-            _windowPresenter.ClearPath();
-            _windowPresenter.ClearSystemEntries();
-            _windowPresenter.ClearEntryInfo();
         }
 
         private void UpdateWindowElements()
         {
-            _entryInfos = GetEntryInfosAddingBackToParent();
+            UpdateEntryInfos();
             SetCorrectSelectedItemIndex();
 
-            _windowPresenter.ShowPath(_fileSystem.Path);
             _windowPresenter.ShowSystemEntries(_entryInfos);
+            _windowPresenter.ShowEntryInfo(_entryInfos[_selectedItemIndex]);
 
-            if (AutoShowSelectedItem)
+            if (IsActive)
             {
-                ShowSelectedItem();
+                _windowPresenter.ShowHighlightedPath(_fileSystem.Path);
+                _windowPresenter.HighlightEntry(_selectedItemIndex, _entryInfos);
             }
+            else
+            {
+                _windowPresenter.ShowUnhighlightedPath(_fileSystem.Path);
+            }
+        }
+
+        private void UpdateEntryInfos()
+        {
+            _entryInfos = _fileSystem.GetEntryInfos();
+            EntryInfosAddBackToParent();
+        }
+
+        private void EntryInfosAddBackToParent()
+        {
+            if (_fileSystem.IsRoot) return;
+
+            var backEntryInfo = new EntryInfo
+            {
+                Name = "..",
+                Attributes = FileAttributes.Directory
+            };
+
+            _entryInfos.Insert(0, backEntryInfo);
         }
 
         private void SetCorrectSelectedItemIndex()

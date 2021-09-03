@@ -5,6 +5,7 @@ namespace FileManager.ConsoleUI.Settings
 {
     public abstract class WindowSettingsBase : IWindowSettings
     {
+        public string HeaderValue => "Name";
         public int WindowHeight => Console.WindowHeight;
         public int EntryInfosHeight => WindowHeight - 2;
         public int EntryMaxHeight => WindowHeight - 3;
