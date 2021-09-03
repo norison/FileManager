@@ -154,7 +154,7 @@ namespace FileManager.ConsoleUI
             var position = GetPathStartPosition(pathWithSpaces);
             var resizedPath = GetResizedPath(pathWithSpaces);
 
-            PrintField(position, Console.WindowTop, resizedPath);
+            PrintField(position, 0, resizedPath);
         }
 
         private void ClearPath()
@@ -348,7 +348,7 @@ namespace FileManager.ConsoleUI
             ClearEntryInfo();
             _colorant.SetEntryInfoColor();
             PrintEntryInfoName(entryInfo.Name);
-            PrintEntryInfoSizeAndTime(entryInfo);
+            PrintEntryInfoDetails(entryInfo);
         }
 
         private void ClearEntryInfo()
@@ -368,7 +368,7 @@ namespace FileManager.ConsoleUI
             PrintField(_settings.LeftEntriesStartPosition, _settings.EntryInfosHeight, resizedEntryName);
         }
 
-        private void PrintEntryInfoSizeAndTime(EntryInfo entryInfo)
+        private void PrintEntryInfoDetails(EntryInfo entryInfo)
         {
             var text = entryInfo.ConvertToUserFriendlyText();
             var resizedText = GetResizedField(text, _settings.RightEntryMaxLength);
@@ -383,20 +383,14 @@ namespace FileManager.ConsoleUI
         {
             _colorant.SetWindowColor();
 
-            Console.SetCursorPosition(_settings.LeftBorderPosition, 0);
+            var length = _settings.RightBorderPosition - _settings.LeftBorderPosition;
 
             for (var i = 0; i < _settings.WindowHeight; i++)
             {
-                for (var j = _settings.LeftBorderPosition; j <= _settings.RightBorderPosition; j++)
-                {
-                    Console.Write(' ');
-                }
-
-                Console.CursorLeft = _settings.LeftBorderPosition;
-                Console.CursorTop++;
+                var startPosition = _settings.LeftBorderPosition;
+                var text = new string(' ', length);
+                PrintField(startPosition, i, text);
             }
-
-            Console.CursorVisible = false;
         }
 
         private string GetResizedField(string field, int maxLength)
