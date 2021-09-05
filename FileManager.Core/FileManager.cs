@@ -1,53 +1,44 @@
 ﻿using FileManager.Core.Interfaces;
+using System.Collections.Generic;
 
 namespace FileManager.Core
 {
-    public enum WindowPart
-    {
-        First,
-        Second
-    }
-
     public class FileManager : IFileManager
     {
         #region Private Fields
 
-        private readonly IWindow _firstWindow;
-        private readonly IWindow _secondWindow;
+        private readonly IList<IWindow> _windows;
         private readonly ICommandManager _commandManager;
 
-        private WindowPart _selectedWindowPart;
+        private int _selectedWindowIndex;
         private IWindow _selectedWindow;
 
         #endregion
 
         #region Constructor
 
-        public FileManager(IWindow firstWindow, IWindow secondWindow, ICommandManager commandManager)
+        public FileManager(IList<IWindow> windows, ICommandManager commandManager)
         {
-            _firstWindow = firstWindow;
-            _secondWindow = secondWindow;
+            _windows = windows;
             _commandManager = commandManager;
-
-            _selectedWindowPart = WindowPart.First;
-            _selectedWindow = _firstWindow;
-            _selectedWindow.IsActive = true;
         }
 
         public void Dispose()
         {
-            _firstWindow?.Dispose();
-            _secondWindow?.Dispose();
+            foreach (var window in _windows)
+            {
+                window.Dispose();
+            }
         }
 
         #endregion
 
         #region Methods
 
-        public void Start()
+        public void Run()
         {
-            _firstWindow.ShowWindow();
-            _secondWindow.ShowWindow();
+            ShowWindows();
+            SelectFirstWindowAndActivate();
 
             var exitRequested = false;
 
@@ -69,28 +60,33 @@ namespace FileManager.Core
                     case Command.Switch:
                         SwitchWindow();
                         break;
-                    case Command.Back:
+                    case Command.Exit:
                         exitRequested = true;
                         break;
                 }
             }
         }
 
+        private void ShowWindows()
+        {
+            foreach (var window in _windows)
+            {
+                window.ShowWindow();
+            }
+        }
+
+        private void SelectFirstWindowAndActivate()
+        {
+            _selectedWindowIndex = 0;
+            _selectedWindow = _windows[_selectedWindowIndex];
+            _selectedWindow.IsActive = true;
+        }
+
         private void SwitchWindow()
         {
             _selectedWindow.IsActive = false;
-
-            if (_selectedWindowPart == WindowPart.First)
-            {
-                _selectedWindowPart = WindowPart.Second;
-                _selectedWindow = _secondWindow;
-            }
-            else
-            {
-                _selectedWindowPart = WindowPart.First;
-                _selectedWindow = _firstWindow;
-            }
-
+            _selectedWindowIndex = _selectedWindowIndex == _windows.Count - 1 ? 0 : _selectedWindowIndex + 1;
+            _selectedWindow = _windows[_selectedWindowIndex];
             _selectedWindow.IsActive = true;
         }
 

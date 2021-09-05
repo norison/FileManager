@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FileManager.ConsoleUI.Color;
 using FileManager.ConsoleUI.Settings;
 using FileManager.Core;
@@ -28,10 +29,12 @@ namespace FileManager.ConsoleUI
 
             ICommandManager commandManager = new ConsoleCommandManager();
 
-            IFileManager fileManager = new Core.FileManager(leftWindow, rightWindow, commandManager);
+            IList<IWindow> windows = new List<IWindow> { leftWindow, rightWindow };
+
+            IFileManager fileManager = new Core.FileManager(windows, commandManager);
 
             windowSizeMonitoring.Start();
-            fileManager.Start();
+            fileManager.Run();
 
             fileManager.Dispose();
             windowSizeMonitoring.Dispose();

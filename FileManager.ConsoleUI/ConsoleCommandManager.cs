@@ -21,7 +21,7 @@ namespace FileManager.ConsoleUI
                 case ConsoleKey.Tab:
                     return Command.Switch;
                 case ConsoleKey.Escape:
-                    return Command.Back;
+                    return Command.Exit;
                 default:
                     return Command.Unknown;
             }

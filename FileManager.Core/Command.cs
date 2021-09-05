@@ -7,6 +7,6 @@
         Down,
         Action,
         Switch,
-        Back
+        Exit
     }
 }
