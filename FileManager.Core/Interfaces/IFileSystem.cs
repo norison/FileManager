@@ -7,7 +7,10 @@ namespace FileManager.Core.Interfaces
     {
         string Path { get; }
         bool IsRoot { get; }
-        IList<EntryInfo> GetEntryInfos();
+        int FilesCount { get; }
+        int FoldersCount { get; }
+        long Bytes { get; }
+        IEnumerable<EntryInfo> EntryInfos { get; }
         void GoToParent();
         void ChangeDirectory(string path);
     }

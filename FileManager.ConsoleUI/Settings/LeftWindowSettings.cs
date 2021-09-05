@@ -18,5 +18,7 @@ namespace FileManager.ConsoleUI.Settings
         public override int LeftEntryMaxLength => CenterPosition - 1;
         public override int RightEntryMaxLength => WindowWidth - CenterPosition - 2;
         public override int EntryInfoNameMaxLength => CenterPosition - LeftBorderPosition - 2;
+        public override int FolderInfoStartPosition => PathStartPosition;
+        public override int FolderInfoMaxLength => PathMaxLength;
     }
 }

@@ -213,18 +213,7 @@ namespace FileManager.ConsoleUI
         public void ShowSystemEntries(IList<EntryInfo> entryInfos)
         {
             ClearSystemEntries();
-
-            for (var i = 0; i < entryInfos.Count; i++)
-            {
-                if (i >= _settings.MaxEntriesLength)
-                {
-                    break;
-                }
-
-                var entryInfo = entryInfos[i];
-                _colorant.SetColorByEntryType(entryInfo);
-                PrintEntry(i, entryInfo);
-            }
+            PrintEntries(0, entryInfos, _settings.MaxEntriesLength);
         }
 
         private void ClearSystemEntries()
@@ -282,51 +271,42 @@ namespace FileManager.ConsoleUI
 
         public void HighlightEntry(int index, IList<EntryInfo> entryInfos)
         {
-            if (index >= _settings.MaxEntriesLength - 1)
+            var maxIndex = GetMaxIndex();
+            int entryPosition;
+
+            if (index >= maxIndex)
             {
-                ClearSystemEntries();
-
-                for (var i = 0; i < _settings.MaxEntriesLength; i++)
-                {
-                    var entryInfo = entryInfos[index - _settings.MaxEntriesLength + 1 + i];
-
-                    if (i == _settings.MaxEntriesLength - 1)
-                    {
-                        _colorant.SetHighlightedEntryColor();
-                    }
-                    else
-                    {
-                        _colorant.SetColorByEntryType(entryInfo);
-                    }
-
-                    PrintEntry(i, entryInfo);
-                }
+                entryPosition = maxIndex;
+                PrintEntriesWithOutOfScopeIndex(index, entryInfos);
             }
             else
             {
-                _colorant.SetHighlightedEntryColor();
-
-                ClearEntry(index);
-                PrintEntry(index, entryInfos[index]);
+                entryPosition = index;
             }
+
+            PrintHighlightedEntry(entryPosition, entryInfos[index]);
+        }
+
+        private void PrintHighlightedEntry(int index, EntryInfo entryInfo)
+        {
+            _colorant.SetHighlightedEntryColor();
+            ClearEntry(index);
+            PrintEntry(index, entryInfo);
         }
 
         public void DehighlightEntry(int index, IList<EntryInfo> entryInfos)
         {
-            var entryInfo = entryInfos[index];
+            var maxIndex = GetMaxIndex();
+            var entryPosition = index >= maxIndex ? maxIndex : index;
 
-            if (index >= _settings.MaxEntriesLength - 1)
-            {
-                _colorant.SetColorByEntryType(entryInfo);
-                ClearEntry(_settings.MaxEntriesLength - 1);
-                PrintEntry(_settings.MaxEntriesLength - 1, entryInfo);
-            }
-            else
-            {
-                _colorant.SetColorByEntryType(entryInfo);
-                ClearEntry(index);
-                PrintEntry(index, entryInfo);
-            }
+            PrintDehighlightedEntry(entryPosition, entryInfos[index]);
+        }
+
+        private void PrintDehighlightedEntry(int index, EntryInfo entryInfo)
+        {
+            _colorant.SetColorByEntryType(entryInfo);
+            ClearEntry(index);
+            PrintEntry(index, entryInfo);
         }
 
         private void ClearEntry(int index)
@@ -337,6 +317,34 @@ namespace FileManager.ConsoleUI
 
             var text = new string(' ', maxLength);
             PrintField(startPosition, top, text);
+        }
+
+        private void PrintEntriesWithOutOfScopeIndex(int index, IList<EntryInfo> entryInfos)
+        {
+            ClearSystemEntries();
+            PrintEntries(index - _settings.MaxEntriesLength + 1, entryInfos, _settings.MaxEntriesLength);
+        }
+
+        private void PrintEntries(int startIndex, IList<EntryInfo> entryInfos, int count)
+        {
+            var endIndex = entryInfos.Count - 1;
+
+            for (var i = 0; i < count; i++)
+            {
+                if (i > endIndex)
+                {
+                    break;
+                }
+
+                var entryInfo = entryInfos[startIndex + i];
+                _colorant.SetColorByEntryType(entryInfo);
+                PrintEntry(i, entryInfo);
+            }
+        }
+
+        private int GetMaxIndex()
+        {
+            return _settings.MaxEntriesLength - 1;
         }
 
         #endregion
@@ -377,6 +385,47 @@ namespace FileManager.ConsoleUI
 
         #endregion
 
+        #region FolderInfo
+
+        public void ShowFolderInfo(string info)
+        {
+            ClearFolderInfo();
+
+            var infoWithSpaces = $" {info} ";
+            var position = GetFolderInfoStartPosition(infoWithSpaces);
+            var resizedText = GetResizedFolderInfo(infoWithSpaces);
+            PrintField(position, _settings.FolderInfoHeight, resizedText);
+        }
+
+        private void ClearFolderInfo()
+        {
+            _colorant.SetBorderColor();
+            var text = new string(BorderSymbols.HorizontalStraightLine, _settings.FolderInfoMaxLength);
+            PrintField(_settings.FolderInfoStartPosition, _settings.FolderInfoHeight, text);
+        }
+
+        private int GetFolderInfoStartPosition(string text)
+        {
+            if (text.Length < _settings.FolderInfoMaxLength)
+            {
+                return _settings.CenterPosition - text.Length / 2;
+            }
+
+            return _settings.FolderInfoStartPosition;
+        }
+
+        private string GetResizedFolderInfo(string text)
+        {
+            if (text.Length < _settings.FolderInfoMaxLength)
+            {
+                return text;
+            }
+
+            return text.Substring(0, _settings.FolderInfoMaxLength - 3) + "...";
+        }
+
+        #endregion
+
         #region Common
 
         public void ClearWindow()
@@ -391,6 +440,8 @@ namespace FileManager.ConsoleUI
                 var text = new string(' ', length);
                 PrintField(startPosition, i, text);
             }
+
+            Console.CursorVisible = false;
         }
 
         private string GetResizedField(string field, int maxLength)

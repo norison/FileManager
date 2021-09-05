@@ -13,6 +13,7 @@ namespace FileManager.ConsoleUI.Settings
         public int EntryInfoLength => RightBorderPosition - LeftBorderPosition - EntryStartHeight;
         public int BottomBorderHeight => WindowHeight - 1;
         public int EntriesLength => EntryMaxHeight - EntryStartHeight;
+        public int FolderInfoHeight => BottomBorderHeight;
 
         public abstract int MaxEntriesLength { get; }
         public abstract int WindowWidth { get; }
@@ -28,5 +29,7 @@ namespace FileManager.ConsoleUI.Settings
         public abstract int LeftEntryMaxLength { get; }
         public abstract int RightEntryMaxLength { get; }
         public abstract int EntryInfoNameMaxLength { get; }
+        public abstract int FolderInfoStartPosition { get; }
+        public abstract int FolderInfoMaxLength { get; }
     }
 }

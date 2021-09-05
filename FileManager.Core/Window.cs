@@ -1,8 +1,10 @@
-﻿using FileManager.Core.Interfaces;
+﻿using System;
+using FileManager.Core.Interfaces;
 using FileManager.Models;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace FileManager.Core
 {
@@ -134,7 +136,7 @@ namespace FileManager.Core
 
                 UpdateWindowElements();
             }
-            catch
+            catch(Exception exception)
             {
                 // TODO: add error popup
             }
@@ -147,6 +149,7 @@ namespace FileManager.Core
 
             _windowPresenter.ShowSystemEntries(_entryInfos);
             _windowPresenter.ShowEntryInfo(_entryInfos[_selectedItemIndex]);
+            _windowPresenter.ShowFolderInfo($"Bytes: {_fileSystem.Bytes}. Folders: {_fileSystem.FoldersCount}. Files: {_fileSystem.FilesCount}");
 
             if (IsActive)
             {
@@ -161,7 +164,7 @@ namespace FileManager.Core
 
         private void UpdateEntryInfos()
         {
-            _entryInfos = _fileSystem.GetEntryInfos();
+            _entryInfos = _fileSystem.EntryInfos.ToList();
             EntryInfosAddBackToParent();
         }
 

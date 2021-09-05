@@ -14,5 +14,6 @@ namespace FileManager.Core.Interfaces
         void ShowEntryInfo(EntryInfo entryInfo);
         void HighlightEntry(int index, IList<EntryInfo> entryInfos);
         void DehighlightEntry(int index, IList<EntryInfo> entryInfos);
+        void ShowFolderInfo(string info);
     }
 }

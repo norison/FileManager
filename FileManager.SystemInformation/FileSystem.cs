@@ -11,7 +11,6 @@ namespace FileManager.SystemInformation
         #region Private Fields
 
         private DirectoryInfo _directoryInfo;
-        private Dictionary<string, FileSystemInfo> _fileSystemInfos;
 
         #endregion
 
@@ -19,6 +18,10 @@ namespace FileManager.SystemInformation
 
         public string Path => _directoryInfo?.FullName;
         public bool IsRoot => _directoryInfo?.Parent == null;
+        public int FilesCount { get; private set; }
+        public int FoldersCount { get; private set; }
+        public long Bytes { get; private set; }
+        public IEnumerable<EntryInfo> EntryInfos { get; private set; }
 
         #endregion
 
@@ -35,7 +38,7 @@ namespace FileManager.SystemInformation
 
         public void GoToParent()
         {
-            if(IsRoot) return;
+            if (IsRoot) return;
 
             Setup(_directoryInfo.Parent?.FullName);
         }
@@ -43,23 +46,6 @@ namespace FileManager.SystemInformation
         public void ChangeDirectory(string path)
         {
             Setup(path);
-        }
-
-        public IList<EntryInfo> GetEntryInfos()
-        {
-            return _fileSystemInfos.Values
-                .Select(info => new EntryInfo
-                {
-                    Name = info.Name,
-                    FullPath = info.FullName,
-                    Attributes = info.Attributes,
-                    Extenstion = info.Extension,
-                    CreationTime = info.CreationTime,
-                    Bytes = info.Attributes.HasFlag(FileAttributes.Directory)
-                    ? 0
-                    : new FileInfo(info.FullName).Length
-                })
-                .ToList();
         }
 
         #endregion
@@ -84,7 +70,33 @@ namespace FileManager.SystemInformation
 
         private void InitializeFileInfos()
         {
-            _fileSystemInfos = _directoryInfo.GetFileSystemInfos().ToDictionary(info => info.FullName);
+            var directories = _directoryInfo.GetDirectories();
+            var files = _directoryInfo.GetFiles();
+
+            FoldersCount = directories.Length;
+            FilesCount = files.Length;
+            Bytes = files.Sum(fileInfo => fileInfo.Length);
+
+            var systemInfos = new FileSystemInfo[directories.Length + files.Length];
+            directories.CopyTo(systemInfos, 0);
+            files.CopyTo(systemInfos, directories.Length);
+
+            EntryInfos = GetEntryInfos(systemInfos);
+        }
+
+        private IEnumerable<EntryInfo> GetEntryInfos(IEnumerable<FileSystemInfo> systemInfos)
+        {
+            return systemInfos.Select(info => new EntryInfo
+            {
+                Name = info.Name,
+                FullPath = info.FullName,
+                Attributes = info.Attributes,
+                Extenstion = info.Extension,
+                CreationTime = info.CreationTime,
+                Bytes = info.Attributes.HasFlag(FileAttributes.Directory)
+                        ? 0
+                        : new FileInfo(info.FullName).Length
+            });
         }
 
         #endregion

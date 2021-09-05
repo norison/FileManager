@@ -12,6 +12,7 @@
         int BottomBorderHeight { get; }
         int MaxEntriesLength { get; }
         int WindowWidth { get; }
+        int FolderInfoHeight { get; }
         int LeftBorderPosition { get; }
         int RightBorderPosition { get; }
         int CenterPosition { get; }
@@ -24,5 +25,7 @@
         int LeftEntryMaxLength { get; }
         int RightEntryMaxLength { get; }
         int EntryInfoNameMaxLength { get; }
+        int FolderInfoStartPosition { get; }
+        int FolderInfoMaxLength { get; }
     }
 }
