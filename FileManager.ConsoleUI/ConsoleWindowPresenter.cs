@@ -152,9 +152,10 @@ namespace FileManager.ConsoleUI
         {
             var pathWithSpaces = $" {path} ";
             var position = GetPathStartPosition(pathWithSpaces);
+            var top = 0;
             var resizedPath = GetResizedPath(pathWithSpaces);
 
-            PrintField(position, 0, resizedPath);
+            PrintField(position, top, resizedPath);
         }
 
         private void ClearPath()
@@ -163,8 +164,9 @@ namespace FileManager.ConsoleUI
 
             var startPosition = _settings.PathStartPosition;
             var text = new string(BorderSymbols.HorizontalStraightLine, _settings.PathMaxLength);
+            var top = 0;
 
-            PrintField(startPosition, 0, text);
+            PrintField(startPosition, top, text);
         }
 
         private int GetPathStartPosition(string path)
@@ -202,8 +204,15 @@ namespace FileManager.ConsoleUI
 
         private void PrintHeader(int position)
         {
-            var centerPosition = position - _settings.HeaderValue.Length / 2;
-            PrintField(centerPosition, 1, _settings.HeaderValue);
+            var centerPosition = GetHeaderCenterPosition(position);
+            var top = 1;
+
+            PrintField(centerPosition, top, _settings.HeaderValue);
+        }
+
+        private int GetHeaderCenterPosition(int position)
+        {
+            return position - _settings.HeaderValue.Length / 2;
         }
 
         #endregion
@@ -362,25 +371,29 @@ namespace FileManager.ConsoleUI
         private void ClearEntryInfo()
         {
             _colorant.SetWindowColor();
-            var startPosition = _settings.LeftEntriesStartPosition;
-            var top = _settings.EntryInfosHeight;
-            var maxLength = _settings.EntryInfoLength;
-
-            var text = new string(' ', maxLength);
-            PrintField(startPosition, top, text);
+            PrintField(_settings.LeftEntriesStartPosition, _settings.EntryInfosHeight, new string(' ', _settings.EntryInfoLength));
         }
 
         private void PrintEntryInfoName(string entryName)
         {
-            var resizedEntryName = GetResizedField(entryName, _settings.EntryInfoNameMaxLength);
-            PrintField(_settings.LeftEntriesStartPosition, _settings.EntryInfosHeight, resizedEntryName);
+            var position = _settings.LeftEntriesStartPosition;
+            var top = _settings.EntryInfosHeight;
+            var text = GetResizedField(entryName, _settings.EntryInfoNameMaxLength);
+
+            PrintField(position, top, text);
         }
 
         private void PrintEntryInfoDetails(EntryInfo entryInfo)
         {
             var text = entryInfo.ConvertToUserFriendlyText();
             var resizedText = GetResizedField(text, _settings.RightEntryMaxLength);
-            PrintField(_settings.RightBorderPosition - resizedText.Length, _settings.EntryInfosHeight, resizedText);
+            var position = GetEntryInfoDetailsPosition(resizedText);
+            PrintField(position, _settings.EntryInfosHeight, resizedText);
+        }
+
+        private int GetEntryInfoDetailsPosition(string text)
+        {
+            return _settings.RightBorderPosition - text.Length;
         }
 
         #endregion
@@ -393,15 +406,21 @@ namespace FileManager.ConsoleUI
 
             var infoWithSpaces = $" {info} ";
             var position = GetFolderInfoStartPosition(infoWithSpaces);
+            var top = _settings.FolderInfoHeight;
             var resizedText = GetResizedFolderInfo(infoWithSpaces);
-            PrintField(position, _settings.FolderInfoHeight, resizedText);
+
+            PrintField(position, top, resizedText);
         }
 
         private void ClearFolderInfo()
         {
             _colorant.SetBorderColor();
+
             var text = new string(BorderSymbols.HorizontalStraightLine, _settings.FolderInfoMaxLength);
-            PrintField(_settings.FolderInfoStartPosition, _settings.FolderInfoHeight, text);
+            var position = _settings.FolderInfoStartPosition;
+            var top = _settings.FolderInfoHeight;
+
+            PrintField(position, top, text);
         }
 
         private int GetFolderInfoStartPosition(string text)
